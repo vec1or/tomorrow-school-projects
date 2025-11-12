@@ -1,55 +1,36 @@
+// main.go
 package main
 
 import (
-	//"fmt"
+	"fmt"
+	"io/ioutil"
 	"os"
-	"strings"
 )
 
 func main() {
-	// Создаём тестовый входной файл
-	createInputFile()
-
-	// Проверка аргументов
-	if len(os.Args) != 3 {
+	if len(os.Args) == 1 {
+		// helper to create sample input when running without args (for quick manual testing)
+		_ = ioutil.WriteFile("sample.txt", []byte("this is well-known (cap)"), 0644)
+		fmt.Println("Wrote sample.txt. Run: go run . sample.txt result.txt")
 		return
+	}
+
+	if len(os.Args) != 3 {
+		fmt.Fprintln(os.Stderr, "usage: go run . <input-file> <output-file>")
+		os.Exit(2)
 	}
 
 	inputFile := os.Args[1]
 	outputFile := os.Args[2]
 
-	// Чтение входного файла
-	data, err := os.ReadFile(inputFile)
+	data, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		panic(err)
 	}
 
-	// Разбиваем текст на слова
-	words := strings.Fields(string(data))
+	out := ProcessFullText(string(data))
 
-	// Обрабатываем текст
-	words = ProcessText(words)
-
-	// Собирам текст обратно
-	result := strings.Join(words, " ")
-
-	// Записываем результат
-	err = os.WriteFile(outputFile, []byte(result), 0644)
-	if err != nil {
-		panic(err)
-	}
-}
-
-// Создание входного файла sample.txt
-func createInputFile() {
-	file, err := os.Create("sample.txt")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	_, err = file.WriteString("it (cap) was the best of times, it was the worst of times (up) , it was the age of wisdom, it was the age of foolishness (cap, 6) , it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of darkness, it was the spring of hope, IT WAS THE (low, 3) winter of despair.")
-	if err != nil {
+	if err := ioutil.WriteFile(outputFile, []byte(out), 0644); err != nil {
 		panic(err)
 	}
 }
