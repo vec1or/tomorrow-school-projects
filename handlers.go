@@ -129,58 +129,129 @@ func Capitalize(word string) string {
 	return string(runes)
 }
 
+// helper: does the next word start with a vowel *sound*?
+func startsWithVowelSound(word string) bool {
+	if word == "" {
+		return false
+	}
+	lower := strings.ToLower(word)
+
+	// Silent-h words: "an hour", "an honest man", etc.
+	silentH := []string{
+		"hour", "hours",
+		"honest", "honesty",
+		"honor", "honour", "honors", "honours",
+		"heir", "heirs",
+	}
+	for _, sh := range silentH {
+		if strings.HasPrefix(lower, sh) {
+			return true
+		}
+	}
+
+	runes := []rune(lower)
+	first := runes[0]
+	// Only true vowels; 'h' is consonant unless caught above
+	return strings.ContainsRune("aeiou", first)
+}
+
 // assemble builds final string with proper punctuation, quotes, and articles
 func assemble(tokens []string) string {
 	var b strings.Builder
 	inSingleQuote := false
+	lastWasOpeningQuote := false
 
 	isWord := regexp.MustCompile(`^[\p{L}0-9-]+$`)
 
+	articleSet := map[string]bool{
+		"a":  true,
+		"an": true,
+		"A":  true,
+		"An": true,
+	}
+
 	for i, tok := range tokens {
+		// Handle single quotes as opening/closing quotes
 		if tok == "'" {
 			if !inSingleQuote {
+				// Opening quote: ensure space before it (if needed)
+				if b.Len() > 0 {
+					last := b.String()[b.Len()-1]
+					if last != ' ' {
+						b.WriteString(" ")
+					}
+				}
 				b.WriteString("'")
 				inSingleQuote = true
-				continue
+				lastWasOpeningQuote = true
 			} else {
+				// Closing quote
 				b.WriteString("'")
 				inSingleQuote = false
-				continue
-			}
-		}
-
-		if isPunct(tok) {
-			b.WriteString(tok)
-			if i+1 < len(tokens) && !isPunct(tokens[i+1]) && tokens[i+1] != "'" {
-				b.WriteString(" ")
+				lastWasOpeningQuote = false
 			}
 			continue
 		}
 
-		// handle article 'a' -> 'an'
-		if (tok == "a" || tok == "A") && i+1 < len(tokens) && isWord.MatchString(tokens[i+1]) {
-			next := strings.ToLower(tokens[i+1])
-			if len(next) > 0 && strings.ContainsRune("aeiouh", rune(next[0])) {
-				if tok == "A" {
-					tok = "An"
-				} else {
-					tok = "an"
+		// Punctuation (.,!:;?)
+		if isPunct(tok) {
+			b.WriteString(tok)
+			// Add space after punctuation unless next is punctuation or quote
+			if i+1 < len(tokens) && !isPunct(tokens[i+1]) && tokens[i+1] != "'" {
+				b.WriteString(" ")
+			}
+			lastWasOpeningQuote = false
+			continue
+		}
+
+		// --- Article correction ("a" / "an" / "A" / "An") ---
+		if articleSet[tok] && i+1 < len(tokens) && isWord.MatchString(tokens[i+1]) {
+			next := tokens[i+1]
+
+			// If the *next* token is itself an article, skip correcting this one.
+			// This matches cases like "A a apple" from the tests.
+			if !articleSet[next] {
+				vowelSound := startsWithVowelSound(next)
+
+				switch tok {
+				case "a":
+					if vowelSound {
+						tok = "an"
+					}
+				case "an":
+					if !vowelSound {
+						tok = "a"
+					}
+				case "A":
+					if vowelSound {
+						tok = "An"
+					}
+				case "An":
+					if !vowelSound {
+						tok = "A"
+					}
 				}
 			}
 		}
 
+		// Normal word-like tokens: decide if we need a space before
 		if b.Len() > 0 {
 			last := b.String()[b.Len()-1]
-			if last != ' ' && last != '\'' {
+			// Don't insert space right after an opening quote,
+			// but do everywhere else (if last isn't already space).
+			if !lastWasOpeningQuote && last != ' ' {
 				b.WriteString(" ")
 			}
 		}
 
+		lastWasOpeningQuote = false
 		b.WriteString(tok)
 	}
 
 	return strings.TrimSpace(b.String())
 }
+
+
 
 // isPunct returns true if token is punctuation
 func isPunct(tok string) bool {
