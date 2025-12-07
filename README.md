@@ -15,7 +15,7 @@ Go-Reloaded is a command-line tool that reads text files and applies specific tr
 - Article manipulations
 
 ## Pay Attention
-For (low), (up), (cap) if a number appears next to it, like so: (low, <number>) it turns the previously specified number of words in lowercase, uppercase or capitalized accordingly. (Ex: "This is so exciting (up, 2)" -> "This is SO EXCITING")
+For (low), (up), (cap) if a number appears next to it, like so: (low, number) it turns the previously specified number of words in lowercase, uppercase or capitalized accordingly. (Ex: "This is so exciting (up, 2)" -> "This is SO EXCITING")
 
 ## Project Structure
 
