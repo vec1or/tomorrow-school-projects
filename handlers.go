@@ -232,7 +232,7 @@ func assemble(tokens []string) string {
 			}
 		}
 
-		// Word-like
+		// space checker
 		if b.Len() > 0 {
 			last := b.String()[b.Len()-1]
 			if !lastWasOpeningQuote && last != ' ' {
