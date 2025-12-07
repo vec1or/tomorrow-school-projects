@@ -9,8 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) == 1 {
-		// helper to create sample input when running without args (for quick manual testing)
-		_ = ioutil.WriteFile("sample.txt", []byte("this is well-known (cap)"), 0644)
+		_ = ioutil.WriteFile("sample.txt", []byte("I have to pack 101 (bin) outfits. Packed 1a (hex) just to be sure"), 0644)
 		fmt.Println("Wrote sample.txt. Run: go run . sample.txt result.txt")
 		return
 	}

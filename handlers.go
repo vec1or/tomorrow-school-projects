@@ -1,3 +1,4 @@
+//handlers.go
 package main
 
 import (
@@ -7,7 +8,7 @@ import (
 	"unicode"
 )
 
-// ProcessFullText reads the whole text and applies transformations
+// ProcessFullText reads the whole text and applies changes
 func ProcessFullText(s string) string {
 	s = strings.TrimSpace(s)
 
@@ -18,11 +19,10 @@ func ProcessFullText(s string) string {
 	// Apply commands like (hex), (bin), (cap, n), (up, n), (low, n)
 	tokens = applyCommands(tokens)
 
-	// Assemble final text with punctuation and quotes rules
+	// returns final text
 	return assemble(tokens)
 }
 
-// applyCommands handles commands modifying previous words
 func applyCommands(tokens []string) []string {
 	cmdRE := regexp.MustCompile(`^\(\s*(?i)(hex|bin|up|low|cap)\s*(?:,\s*(\d+)\s*)?\)$`)
 
@@ -48,12 +48,12 @@ func applyCommands(tokens []string) []string {
 					tokens[j] = binToDec(tokens[j])
 				}
 			case "up", "low", "cap":
-				// collect previous `count` "word-like" tokens (not commands or punctuation)
+				// collect previous count "word-like"
 				indices := []int{}
 				j := i - 1
 				for j >= 0 && len(indices) < count {
 					if tokens[j] != "" && !strings.HasPrefix(tokens[j], "(") && !isPunct(tokens[j]) && tokens[j] != "'" {
-						indices = append([]int{j}, indices...) // prepend to preserve order
+						indices = append([]int{j}, indices...)
 					}
 					j--
 				}
@@ -71,7 +71,7 @@ func applyCommands(tokens []string) []string {
 
 			// Remove the command token
 			tokens = append(tokens[:i], tokens[i+1:]...)
-			continue // do not increment i
+			continue
 		}
 		i++
 	}
@@ -79,7 +79,7 @@ func applyCommands(tokens []string) []string {
 	return tokens
 }
 
-// findPrevWordIndex returns the index of previous "word-like" token
+// returns the index of previous "word-like"
 func findPrevWordIndex(tokens []string, from int) int {
 	for j := from - 1; j >= 0; j-- {
 		if tokens[j] != "" && !strings.HasPrefix(tokens[j], "(") && !isPunct(tokens[j]) && tokens[j] != "'" {
@@ -105,7 +105,7 @@ func binToDec(s string) string {
 	return strconv.FormatInt(n, 10)
 }
 
-// Capitalize first letter, lowercase rest, preserve hyphened parts
+// Capitalize first letter
 func Capitalize(word string) string {
 	if word == "" {
 		return word
@@ -129,14 +129,14 @@ func Capitalize(word string) string {
 	return string(runes)
 }
 
-// helper: does the next word start with a vowel *sound*?
+// vowel sound
 func startsWithVowelSound(word string) bool {
 	if word == "" {
 		return false
 	}
 	lower := strings.ToLower(word)
 
-	// Silent-h words: "an hour", "an honest man", etc.
+	// "an hour", "an honest man", etc.
 	silentH := []string{
 		"hour", "hours",
 		"honest", "honesty",
@@ -151,11 +151,10 @@ func startsWithVowelSound(word string) bool {
 
 	runes := []rune(lower)
 	first := runes[0]
-	// Only true vowels; 'h' is consonant unless caught above
+	// vowels except 'h'
 	return strings.ContainsRune("aeiou", first)
 }
 
-// assemble builds final string with proper punctuation, quotes, and articles
 func assemble(tokens []string) string {
 	var b strings.Builder
 	inSingleQuote := false
@@ -171,10 +170,10 @@ func assemble(tokens []string) string {
 	}
 
 	for i, tok := range tokens {
-		// Handle single quotes as opening/closing quotes
+		// opening/closing quotes
 		if tok == "'" {
 			if !inSingleQuote {
-				// Opening quote: ensure space before it (if needed)
+				// opening quote (ensure space before it)
 				if b.Len() > 0 {
 					last := b.String()[b.Len()-1]
 					if last != ' ' {
@@ -196,7 +195,7 @@ func assemble(tokens []string) string {
 		// Punctuation (.,!:;?)
 		if isPunct(tok) {
 			b.WriteString(tok)
-			// Add space after punctuation unless next is punctuation or quote
+			// Add space after punctuation
 			if i+1 < len(tokens) && !isPunct(tokens[i+1]) && tokens[i+1] != "'" {
 				b.WriteString(" ")
 			}
@@ -204,12 +203,11 @@ func assemble(tokens []string) string {
 			continue
 		}
 
-		// --- Article correction ("a" / "an" / "A" / "An") ---
+		// Article correction
 		if articleSet[tok] && i+1 < len(tokens) && isWord.MatchString(tokens[i+1]) {
 			next := tokens[i+1]
 
-			// If the *next* token is itself an article, skip correcting this one.
-			// This matches cases like "A a apple" from the tests.
+			// If the next token is itself an article = skip
 			if !articleSet[next] {
 				vowelSound := startsWithVowelSound(next)
 
@@ -234,11 +232,9 @@ func assemble(tokens []string) string {
 			}
 		}
 
-		// Normal word-like tokens: decide if we need a space before
+		// Word-like
 		if b.Len() > 0 {
 			last := b.String()[b.Len()-1]
-			// Don't insert space right after an opening quote,
-			// but do everywhere else (if last isn't already space).
 			if !lastWasOpeningQuote && last != ' ' {
 				b.WriteString(" ")
 			}
