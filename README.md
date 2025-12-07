@@ -4,12 +4,15 @@
 Go-Reloaded is a command-line tool that reads text files and applies specific transformations using various commands within the text. Finally, it outputs the transformed text.
 
 ## Features
-- Converting a heximal number to decimal
-- Converting a binary number to decimal
-- Сonverting words from lowercase to uppercase and vice versa
-- Capitalizing first letter
+- Converting a heximal number to decimal // command (hex)
+- Converting a binary number to decimal // command (bin)
+- Сonverting words from lowercase to uppercase and vice versa // command (low)/(up)
+- Capitalizing first letter // command (cap)
 - Punctuation fixing
 - Article manipulations
+
+## Pay Attention
+For (low), (up), (cap) if a number appears next to it, like so: (low, <number>) it turns the previously specified number of words in lowercase, uppercase or capitalized accordingly. (Ex: "This is so exciting (up, 2)" -> "This is SO EXCITING")
 
 ## Project Structure
 
@@ -31,7 +34,8 @@ Write text with commands in sample.txt file. Then type:
 Check result.txt for final text.
 
 ### Example
-```$ cat sample.txt
+```
+$ cat sample.txt
 it (cap) was the best of times, it was the worst of times (up) , it was the age of wisdom, it was the age of foolishness (cap, 6) , it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of darkness, it was the spring of hope, IT WAS THE (low, 3) winter of despair.
 $ go run . sample.txt result.txt
 $ cat result.txt
@@ -50,6 +54,8 @@ $ cat sample.txt
 Punctuation tests are ... kinda boring ,what do you think ?
 $ go run . sample.txt result.txt
 $ cat result.txt
-Punctuation tests are... kinda boring, what do you think?```
+Punctuation tests are... kinda boring, what do you think?
+```
 
-For testing: ```go test -v```
+## For Testing
+Type: ```go test -v```
