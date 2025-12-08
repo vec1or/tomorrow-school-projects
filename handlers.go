@@ -8,19 +8,24 @@ import (
 	"unicode"
 )
 
-// ProcessFullText reads the whole text and applies changes
+// reads whole text
 func ProcessFullText(s string) string {
-	s = strings.TrimSpace(s)
+    // split to save '\n'
+    lines := strings.Split(s, "\n")
 
-	// Tokenize: words (including hyphens), commands, punctuation, quotes
-	re := regexp.MustCompile(`\([^)]*\)|[\p{L}0-9-]+|[.,!:;?]+|'`)
-	tokens := re.FindAllString(s, -1)
+    for i := range lines {
+        line := strings.TrimSpace(lines[i])
 
-	// Apply commands like (hex), (bin), (cap, n), (up, n), (low, n)
-	tokens = applyCommands(tokens)
+        // tokens
+        re := regexp.MustCompile(`\([^)]*\)|[\p{L}0-9-]+|[.,!:;?]+|'`)
+        tokens := re.FindAllString(line, -1)
 
-	// returns final text
-	return assemble(tokens)
+        tokens = applyCommands(tokens)
+
+        lines[i] = assemble(tokens)
+    }
+
+    return strings.Join(lines, "\n")
 }
 
 func applyCommands(tokens []string) []string {
