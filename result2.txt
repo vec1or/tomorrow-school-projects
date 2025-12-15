@@ -1,0 +1,286 @@
+It was the best of times, it was the worst of TIMES, it was the age of wisdom, It Was The Age Of Foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of darkness, it was the spring of hope, it was the winter of despair.
+It was the best of times, it was the worst of TIMES, it was the age of wisdom, It Was The Age Of Foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of darkness, it was the spring of hope, it was the winter of despair.
+
+Simply add 66 and 2 and you will see the result is 68.
+Simply add 66 and 2 and you will see the result is 68.
+
+There is no greater agony than bearing an untold story inside you.
+There is no greater agony than bearing an untold story inside you.
+
+Punctuation tests are... kinda boring, what do you think?
+Punctuation tests are... kinda boring, what do you think?
+
+30 files were added
+30 files were added
+
+It has been 2 years
+It has been 2 years
+
+Ready, set, GO!
+Ready, set, GO!
+
+I should stop shouting
+I should stop shouting
+
+Welcome to the Brooklyn Bridge
+Welcome to the Brooklyn Bridge
+
+This is SO EXCITING.
+This is SO EXCITING.
+
+I was sitting over there, and then BAMM!!
+I was sitting over there, and then BAMM!!
+
+I was thinking... You were right
+I was thinking... You were right
+
+I am exactly how they describe me: 'awesome'
+I am exactly how they describe me: 'awesome'
+
+As Elton John said: 'I am the most well-known homosexual in the world'
+As Elton John said: 'I am the most well-known homosexual in the world'
+
+There it was. An amazing rock!
+There it was. An amazing rock!
+
+If I make you breakfast in bed just say thank you instead of: How did you get in MY HOUSE?
+If I make you breakfast in bed just say thank you instead of: How did you get in MY HOUSE?
+
+I have to pack 5 outfits. Packed 26 just to be sure
+I have to pack 5 outfits. Packed 26 just to be sure
+
+Don not be sad, because sad backwards is das. And das not good
+Don not be sad, because sad backwards is das. And das not good
+
+Harold Wilson: 'I am an optimist, but an optimist who carries a raincoat.'
+Harold Wilson: 'I am an optimist, but an optimist who carries a raincoat.'
+
+ARTICLE CORRECTIONS
+
+an apple
+an apple
+
+a cat
+a cat
+
+An APPLE
+An APPLE
+
+An Apple
+An Apple
+
+A an apple
+A an apple
+
+a An apple
+a an apple
+a An apple
+
+a hat
+a hat
+
+an hour
+an hour
+
+a a a a a
+a a a a a
+
+A A A A A
+A A A A A
+
+an or b
+an or b
+
+an and the
+an and the
+
+I am an optimist, but an optimist
+I am an optimist, but an optimist
+
+CASE TRANSFORMATIONS
+
+Good morning, Mr Harold Wilson
+Good morning, Mr Harold Wilson
+
+one Two THREE!!!!!
+one Two THREE
+
+One Two Three
+One Two Three
+
+Abc (L(low) o w
+Abc (l o w )
+
+HELLO World
+HELLO World
+
+DONE
+DONE
+
+one two (cap, a (hex)
+One Two
+
+me (up, 10(bin)
+ME
+
+WORD (LOW(low)
+word
+
+It was a 'Amazing' experience?!
+It was an 'Amazing' experience?!
+
+ARTICLES AND TRANSFORMATIONS
+
+a 'amazing'
+an 'amazing'
+
+
+an alem
+an alem
+
+PUNCTUATION HANDLING
+
+Hello: world. How: are you?
+Hello: world. How: are you?
+
+Elton John
+Elton John
+
+wanna chose
+wanna chose
+
+word!!!!!!!!!!!!........,,,,,,,,,??????????:::::::::;;;;;;;;;;;;;:
+word!!!!!!!!!!!!........,,,,,,,,,??????????:::::::::;;;;;;;;;;;;;:
+
+
+
+2
+2
+
+z
+z
+
+AG
+AG
+
+12
+12
+
+10
+10
+
+171
+171
+
+171
+171
+
+11080
+11080
+
+11080
+11080
+
+659
+659
+
+SINGLE QUOTE HANDLING
+
+hi 'hi' hi
+hi 'hi' hi
+
+hi 'hi' hi!!!!!
+hi 'hi' hi
+
+hi 'hi' hi!!!!!
+hi 'hi' hi
+
+hi 'hi' hi
+hi 'hi' hi
+
+hi 'hi' hi
+hi 'hi' hi
+
+
+one 'two' three '
+one 'two' three '
+
+one 'two' three '' 'four'
+one 'two' three '' 'four'
+
+'Transform INSIDE'
+'Transform INSIDE'
+
+DOUBLE QUOTE HANDLING
+
+EDGE CASES
+
+hex
+hex
+
+word up, 101
+word up, 101
+
+
+
+
+(aaaa)
+(aaaa)
+
+hello (cap, -2) world
+hello world
+
+HELLO world
+hello world
+
+2
+a
+
+2.
+10.
+
+abg
+abg
+
+call a people For Real!!!!
+call a people For Real
+
+Specific Phrases
+
+Hello, world! This is a TEST. 'Another line'
+Hello, world! This is a TEST. 'Another line'!!!!!!
+
+an and b
+an and b
+
+ONE, TWO, three...
+one, two, three...
+
+ONE, TWO, THREE... (low, -9999999999999999999)
+ONE, TWO, THREE...
+
+
+kek 'kek'
+
+if i make you breakfast in bed just say thank you instead of: How did you get in MY HOUSE?
+
+16
+
+10
+
+1111 (BIN(low)
+
+
+
+(cap, -3)
+
+ASDDDD
+HHHHH
+jjj
+
+2751
+
+a 'Awesome'
+a 'Honest'
+
+i am dasda d d hsajh 'dasdadadad' dadasda '' dhkajdhka '
