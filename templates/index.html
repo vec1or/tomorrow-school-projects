@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ASCII ART</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        textarea { width: 400px; height: 100px; }
+        pre { background: #111; color: #0f0; padding: 15px; }
+    </style>
+</head>
+<body>
+
+<h1>ASCII ART WEB</h1>
+
+<form action="/ascii-art" method="POST">
+    <textarea name="text" required>{{.Text}}</textarea><br><br>
+
+    <label><input type="radio" name="banner" value="standard" checked> Standard</label>
+    <label><input type="radio" name="banner" value="shadow"> Shadow</label>
+    <label><input type="radio" name="banner" value="thinkertoy"> Thinkertoy</label>
+    <br><br>
+
+    <button type="submit">Generate</button>
+</form>
+
+{{if .Result}}
+<h2>Result:</h2>
+<pre>{{.Result}}</pre>
+{{end}}
+
+</body>
+</html>
