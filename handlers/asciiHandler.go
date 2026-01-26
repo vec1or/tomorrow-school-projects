@@ -28,10 +28,9 @@ func AsciiArtHandler(w http.ResponseWriter, r *http.Request) {
 
     result, err := ascii.Generate(text, banner)
     if err != nil {
-        log.Println("ASCII ERROR:", err)
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
+	http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
+	return
+}
 
     tmpl, err := template.ParseFiles("templates/index.html")
     if err != nil {

@@ -6,7 +6,7 @@
     <style>
         body { font-family: monospace; padding: 20px; }
         textarea { width: 400px; height: 100px; }
-        pre { background: #111; color: #0f0; padding: 15px; }
+        pre { background: #FFF; color: #111; padding: 15px; }
     </style>
 </head>
 <body>
@@ -14,16 +14,19 @@
 <h1>ASCII ART WEB</h1>
 
 <form action="/ascii-art" method="POST">
-    <textarea name="text" required>{{.Text}}</textarea><br><br>
+    <!-- Сохраняем введённый текст -->
+    <textarea name="text" required>{{.Input}}</textarea><br><br>
 
-    <label><input type="radio" name="banner" value="standard" checked> Standard</label>
-    <label><input type="radio" name="banner" value="shadow"> Shadow</label>
-    <label><input type="radio" name="banner" value="thinkertoy"> Thinkertoy</label>
+    <!-- Сохраняем выбранный баннер -->
+    <label><input type="radio" name="banner" value="standard" {{if eq .Banner "standard"}}checked{{end}}> Standard</label>
+    <label><input type="radio" name="banner" value="shadow" {{if eq .Banner "shadow"}}checked{{end}}> Shadow</label>
+    <label><input type="radio" name="banner" value="thinkertoy" {{if eq .Banner "thinkertoy"}}checked{{end}}> Thinkertoy</label>
     <br><br>
 
     <button type="submit">Generate</button>
 </form>
 
+<!-- Показываем результат только если есть -->
 {{if .Result}}
 <h2>Result:</h2>
 <pre>{{.Result}}</pre>
