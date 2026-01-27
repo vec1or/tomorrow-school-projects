@@ -1,45 +1,62 @@
 package handlers
 
 import (
-    "html/template"
-    "log"
-    "net/http"
+	"html/template"
+	"net/http"
 
-    "ascii-art-web/ascii"
+	"ascii-art-web/ascii"
 )
+
 func AsciiArtHandler(w http.ResponseWriter, r *http.Request) {
-    log.Println("AsciiArtHandler called")
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
-    if r.Method != http.MethodPost {
-        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-        return
-    }
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
-    text := r.FormValue("text")
-    banner := r.FormValue("banner")
+	text := r.FormValue("text")
+	banner := r.FormValue("banner")
 
-    log.Println("TEXT:", text)
-    log.Println("BANNER:", banner)
+	if text == "" || banner == "" {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
-    if text == "" || banner == "" {
-        http.Error(w, "Bad Request", http.StatusBadRequest)
-        return
-    }
+	result, err := ascii.Generate(text, banner)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	validBanners := map[string]bool{
+		"standard":   true,
+		"shadow":     true,
+		"thinkertoy": true,
+	}
 
-    result, err := ascii.Generate(text, banner)
-    if err != nil {
-	http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
-	return
-}
+	if !validBanners[banner] {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
-    tmpl, err := template.ParseFiles("templates/index.html")
-    if err != nil {
-        log.Println("TEMPLATE ERROR:", err)
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
+	tmpl, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-    tmpl.Execute(w, map[string]string{
-        "Result": result,
-    })
+	data := struct {
+		Input  string
+		Banner string
+		Result template.HTML
+	}{
+		Input:  text,
+		Banner: banner,
+		Result: template.HTML(result),
+	}
+
+	tmpl.Execute(w, data)
 }
