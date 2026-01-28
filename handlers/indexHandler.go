@@ -6,16 +6,21 @@ import (
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
+    if r.URL.Path != "/" { // <-- ключевое
+        http.NotFound(w, r)
+        return
+    }
 
-	tmpl, err := template.ParseFiles("templates/index.html")
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+    if r.Method != http.MethodGet {
+        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        return
+    }
 
-	tmpl.Execute(w, nil)
+    tmpl, err := template.ParseFiles("templates/index.html")
+    if err != nil {
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        return
+    }
+
+    _ = tmpl.Execute(w, nil)
 }
