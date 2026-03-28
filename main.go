@@ -44,15 +44,17 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, err := template.ParseFiles("templates/artists.html")
 	if err != nil {
-		fmt.Println("HTML parsing error!", err)
-		http.Error(w, "HTML parsing error!", http.StatusInternalServerError)
+		msg := "HTML parsing error!"
+		fmt.Println(msg, err)
+		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 
 	tmpl2, err := template.ParseFiles("templates/individual_artist.html")
 	if err != nil {
-		fmt.Println("HTML parsing error!", err)
-		http.Error(w, "HTML parsing error!", http.StatusInternalServerError)
+		msg := "HTML parsing error!"
+		fmt.Println(msg, err)
+		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 
