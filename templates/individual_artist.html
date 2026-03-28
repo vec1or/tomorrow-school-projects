@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Individual Artist Page</title>
+</head>
+<body>
+    <h1>Group Name: {{.Name}}</h1>
+    <img src="{{.Image}}">
+    <p>Created: {{.CreationDate}}</p>
+    <p>Members:</p>
+        <ul>
+            {{range .Members}}
+            <li>{{.}}</li>
+            {{end}}
+        </ul>
+    <p>First Album: {{.FirstAlbum}}</p>
+    <p>Locations: {{.Locations}}</p>
+    <p>ConcertDates: {{.ConcertDates}}</p>
+</body>
+</html>
