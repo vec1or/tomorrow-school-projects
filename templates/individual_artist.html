@@ -6,17 +6,23 @@
     <title>Individual Artist Page</title>
 </head>
 <body>
-    <h1>Group Name: {{.Name}}</h1>
-    <img src="{{.Image}}">
-    <p>Created: {{.CreationDate}}</p>
+    <h1>Group Name: {{.Artist.Name}}</h1>
+    <img src="{{.Artist.Image}}">
+    <p>Created: {{.Artist.CreationDate}}</p>
     <p>Members:</p>
         <ul>
-            {{range .Members}}
+            {{range .Artist.Members}}
             <li>{{.}}</li>
             {{end}}
         </ul>
-    <p>First Album: {{.FirstAlbum}}</p>
-    <p>Locations: {{.Locations}}</p>
-    <p>ConcertDates: {{.ConcertDates}}</p>
+    <p>First Album: {{.Artist.FirstAlbum}}</p>
+    {{range $location, $dates := .Relations.DatesLocations}}
+    <p>Concert Location: {{$location}}</p>
+        <ul>
+            {{range $dates}}
+            <li>{{.}}</li>
+            {{end}}
+        </ul>
+    {{end}}
 </body>
 </html>

@@ -21,26 +21,40 @@ type ArtistInfo struct {
 	Relations    string   `json:"relations"`
 }
 
+type ArtistRelations struct {
+	ID             int                 `json:"id"`
+	DatesLocations map[string][]string `json:"datesLocations"`
+}
+
+type ArtistPage struct {
+	Artist    ArtistInfo
+	Relations ArtistRelations
+}
+
 func Artists(w http.ResponseWriter, r *http.Request) {
 	var artistInfo []ArtistInfo
+	var artistRelations ArtistRelations
+	var artistPage ArtistPage
 
 	// need to fix to fetch only once not every time the handler is called!
 	resp, err := http.Get("https://groupietrackers.herokuapp.com/api/artists")
 	if err != nil {
-		http.Error(w, "Failed to connect to Artists API", http.StatusInternalServerError)
-		fmt.Println("Failed to connect to Artists API")
+		msg := "Failed to connect to Artists API"
+		fmt.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&artistInfo)
 	if err != nil {
-		http.Error(w, "Decode error", http.StatusInternalServerError)
-		fmt.Println("decode error:", err)
+		msg := "Decoding error"
+		fmt.Println(msg, err)
+		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println("First Artist Name:", artistInfo[0].Name)
+	// fmt.Println("First Artist Name:", artistInfo[0].Name)
 
 	tmpl, err := template.ParseFiles("templates/artists.html")
 	if err != nil {
@@ -74,7 +88,27 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 
 	for i := 0; i < len(artistInfo); i++ {
 		if artistInfo[i].ID == idInt {
-			tmpl2.Execute(w, artistInfo[i])
+			respRelation, err := http.Get(artistInfo[i].Relations)
+			if err != nil {
+				msg := "Failed to connect to Relations API!"
+				fmt.Println(msg)
+				http.Error(w, msg, http.StatusInternalServerError)
+				return
+			}
+			defer respRelation.Body.Close()
+
+			err = json.NewDecoder(respRelation.Body).Decode(&artistRelations)
+			if err != nil {
+				msg := "Decoding error"
+				fmt.Println(msg, err)
+				http.Error(w, msg, http.StatusInternalServerError)
+				return
+			}
+
+			artistPage.Artist = artistInfo[i]
+			artistPage.Relations = artistRelations
+
+			tmpl2.Execute(w, artistPage)
 			return
 		}
 	}
