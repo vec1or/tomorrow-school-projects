@@ -72,13 +72,23 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idString := strings.TrimPrefix(r.URL.Path, "/artists/")
-	if idString == "" {
+	// Route pattern should follow this structure /artists/{ID}
+	// meaning there should be one element after TrimPrefix and Split that is not empty
+	RouteString := strings.TrimPrefix(r.URL.Path, "/artists/") // e.g. localhost:8080/artists/1/extra
+	RouteSplit := strings.Split(RouteString, "/")
+	if len(RouteSplit) != 1 {
+		msg := "Route format error"
+		fmt.Println(msg)
+		http.Error(w, msg, http.StatusNotFound)
+		return
+	}
+
+	if RouteString == "" {
 		tmpl.Execute(w, artistInfo)
 		return
 	}
 
-	idInt, err := strconv.Atoi(idString)
+	idInt, err := strconv.Atoi(RouteString)
 	if err != nil {
 		msg := "String to Int conversion error!"
 		http.Error(w, msg, http.StatusNotFound)
