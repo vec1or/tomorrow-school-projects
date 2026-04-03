@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -108,9 +109,11 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// fetch API once here, decode and save, then use later in the handler
+	logger := slog.Default()
+	ArtistsAPI := "https://groupietrackers.herokuapp.com/api/artists"
 	var err error
 
-	resp, err := http.Get("https://groupietrackers.herokuapp.com/api/artists")
+	resp, err := http.Get(ArtistsAPI)
 	if err != nil {
 		msg := "Failed to connect to Artists API"
 		fmt.Println(msg)
@@ -145,9 +148,9 @@ func main() {
 	http.HandleFunc("/artists/", Artists)
 
 	// Start the server
-	fmt.Println("Starting server...")
+	logger.Info("Starting server...")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Println("Failed to start HTTP server!")
+		logger.Error("Failed to connect to Artists API", "error", err, "url", ArtistsAPI)
 		return
 	}
 }
