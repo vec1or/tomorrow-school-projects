@@ -31,71 +31,47 @@ type ArtistPage struct {
 	Relations ArtistRelations
 }
 
+// HTML template pointers declaration
+var AllArtistsTemplate *template.Template
+var IndivArtistTemplate *template.Template
+
+// Artists data declaration
+var artistInfo []ArtistInfo
+
 func Artists(w http.ResponseWriter, r *http.Request) {
-	var artistInfo []ArtistInfo
 	var artistRelations ArtistRelations
 	var artistPage ArtistPage
 
-	// need to fix to fetch only once not every time the handler is called!
-	resp, err := http.Get("https://groupietrackers.herokuapp.com/api/artists")
-	if err != nil {
-		msg := "Failed to connect to Artists API"
-		fmt.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-
-	err = json.NewDecoder(resp.Body).Decode(&artistInfo)
-	if err != nil {
-		msg := "Decoding error"
-		fmt.Println(msg, err)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	// fmt.Println("First Artist Name:", artistInfo[0].Name)
-
-	tmpl, err := template.ParseFiles("templates/artists.html")
-	if err != nil {
-		msg := "HTML parsing error!"
-		fmt.Println(msg, err)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
-	tmpl2, err := template.ParseFiles("templates/individual_artist.html")
-	if err != nil {
-		msg := "HTML parsing error!"
-		fmt.Println(msg, err)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-
 	// Route pattern should follow this structure /artists/{ID}
-	// meaning there should be one element after TrimPrefix and Split that is not empty
-	RouteString := strings.TrimPrefix(r.URL.Path, "/artists/") // e.g. localhost:8080/artists/1/extra
-	RouteSplit := strings.Split(RouteString, "/")
-	if len(RouteSplit) != 1 {
-		msg := "Route format error"
-		fmt.Println(msg)
-		http.Error(w, msg, http.StatusNotFound)
-		return
-	}
+	// meaning if /artists/ is trimmed there should be no / symbol
+	RouteString := strings.TrimPrefix(r.URL.Path, "/artists/")
 
 	if RouteString == "" {
-		tmpl.Execute(w, artistInfo)
+		if err := AllArtistsTemplate.Execute(w, artistInfo); err != nil {
+			msg := "All Artists Templace Execution Error!"
+			http.Error(w, msg, http.StatusInternalServerError)
+			fmt.Println(msg, err)
+			return
+		}
+		return
+	} else if strings.Contains(RouteString, "/") {
+		msg := "Invalid Route"
+		http.Error(w, msg, http.StatusNotFound)
+		fmt.Println(msg)
 		return
 	}
 
 	idInt, err := strconv.Atoi(RouteString)
 	if err != nil {
-		msg := "String to Int conversion error!"
-		http.Error(w, msg, http.StatusNotFound)
+		msg := "Artist ID must be a number!"
+		http.Error(w, msg, http.StatusBadRequest)
 		fmt.Println(msg, err)
 		return
 	}
 
+	// Fetching per detailed request for a specified artist is OK?
+	// Loop and compare cause IDs may be shuffeled irl
+	// Looping is fine for this project since the number of Artists is limited
 	for i := 0; i < len(artistInfo); i++ {
 		if artistInfo[i].ID == idInt {
 			respRelation, err := http.Get(artistInfo[i].Relations)
@@ -118,16 +94,57 @@ func Artists(w http.ResponseWriter, r *http.Request) {
 			artistPage.Artist = artistInfo[i]
 			artistPage.Relations = artistRelations
 
-			tmpl2.Execute(w, artistPage)
+			if err := IndivArtistTemplate.Execute(w, artistPage); err != nil {
+				msg := "Individual Artist Template Execution Error!"
+				http.Error(w, msg, http.StatusInternalServerError)
+				fmt.Println(msg, err)
+				return
+			}
 			return
 		}
 	}
-	http.Error(w, "No such ID found!", http.StatusNotFound)
+	http.Error(w, "Artist with such ID NOT found!", http.StatusNotFound)
 }
 
 func main() {
+	// fetch API once here, decode and save, then use later in the handler
+	var err error
+
+	resp, err := http.Get("https://groupietrackers.herokuapp.com/api/artists")
+	if err != nil {
+		msg := "Failed to connect to Artists API"
+		fmt.Println(msg)
+		return
+	}
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&artistInfo)
+	if err != nil {
+		msg := "Decoding error"
+		fmt.Println(msg, err)
+		return
+	}
+
+	// initialize templates here, use later in the handler
+	// declaration != initialization
+	AllArtistsTemplate, err = template.ParseFiles("templates/artists.html")
+	if err != nil {
+		msg := "All Artists HTML parsing error!"
+		fmt.Println(msg, err)
+		return
+	}
+
+	IndivArtistTemplate, err = template.ParseFiles("templates/individual_artist.html")
+	if err != nil {
+		msg := "Individual Artist HTML parsing error!"
+		fmt.Println(msg, err)
+		return
+	}
+
+	// Call the /artists/ handler
 	http.HandleFunc("/artists/", Artists)
 
+	// Start the server
 	fmt.Println("Starting server...")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		fmt.Println("Failed to start HTTP server!")
