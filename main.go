@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"groupie-tracker/internal/models"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -10,38 +11,16 @@ import (
 	"strings"
 )
 
-type ArtistInfo struct {
-	ID           int      `json:"id"`
-	Image        string   `json:"image"`
-	Name         string   `json:"name"`
-	Members      []string `json:"members"`
-	CreationDate int      `json:"creationDate"`
-	FirstAlbum   string   `json:"firstAlbum"`
-	Locations    string   `json:"locations"`
-	ConcertDates string   `json:"concertDates"`
-	Relations    string   `json:"relations"`
-}
-
-type ArtistRelations struct {
-	ID             int                 `json:"id"`
-	DatesLocations map[string][]string `json:"datesLocations"`
-}
-
-type ArtistPage struct {
-	Artist    ArtistInfo
-	Relations ArtistRelations
-}
-
 // HTML template pointers declaration
 var AllArtistsTemplate *template.Template
 var IndivArtistTemplate *template.Template
 
 // Artists data declaration
-var artistInfo []ArtistInfo
+var artistInfo []models.ArtistInfo
 
 func Artists(w http.ResponseWriter, r *http.Request) {
-	var artistRelations ArtistRelations
-	var artistPage ArtistPage
+	var artistRelations models.ArtistRelations
+	var artistPage models.ArtistPage
 
 	// Route pattern should follow this structure /artists/{ID}
 	// meaning if /artists/ is trimmed there should be no / symbol
