@@ -90,6 +90,7 @@ func main() {
 	// fetch API once here, decode and save, then use later in the handler
 	logger := slog.Default()
 	ArtistsAPI := "https://groupietrackers.herokuapp.com/api/artists"
+
 	var err error
 
 	resp, err := http.Get(ArtistsAPI)
