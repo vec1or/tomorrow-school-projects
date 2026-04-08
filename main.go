@@ -2,6 +2,7 @@ package main
 
 import (
 	"groupie-tracker/internal/handler"
+	"groupie-tracker/internal/middleware"
 	"groupie-tracker/internal/repository"
 	"groupie-tracker/internal/service"
 	"html/template"
@@ -42,11 +43,18 @@ func main() {
 	hndlr := handler.NewArtistHandler(logger, svc, AllArtistsTemplate, IndivArtistTemplate)
 
 	// Register Routes
-	http.HandleFunc("/", hndlr.HandleRoot)
-	http.HandleFunc("/artists/", hndlr.HandleArtists)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", hndlr.HandleRoot)
+	mux.HandleFunc("/artists/", hndlr.HandleArtists)
+
+	// Middleware
+	var wrapped http.Handler = mux
+	wrapped = middleware.AllowMethods([]string{http.MethodGet}, wrapped)
+	wrapped = middleware.Logging(logger, wrapped)
+	wrapped = middleware.Recovery(logger, wrapped)
 
 	// Start the server
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8080", wrapped); err != nil {
 		logger.Error("Failed to Start the Server!", "error", err)
 		return
 	}
