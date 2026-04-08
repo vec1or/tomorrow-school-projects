@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"groupie-tracker/internal/handler"
 	"groupie-tracker/internal/middleware"
 	"groupie-tracker/internal/repository"
@@ -9,6 +10,9 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -53,9 +57,27 @@ func main() {
 	wrapped = middleware.Logging(logger, wrapped)
 	wrapped = middleware.Recovery(logger, wrapped)
 
-	// Start the server
-	if err := http.ListenAndServe(":8080", wrapped); err != nil {
-		logger.Error("Failed to Start the Server!", "error", err)
-		return
+	// Graceful Shutdown
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: wrapped,
 	}
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("Server failed", "error", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	sig := <-quit
+	logger.Info("Shutdown signal Ctrl+C received", "signal", sig)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Error("Server Shutdown Error!", "Error", err)
+	}
+	logger.Info("Server stopped gracefully!")
 }
