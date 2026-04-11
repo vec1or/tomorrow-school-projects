@@ -1,0 +1,60 @@
+{{template "base" .}}
+
+{{define "title"}}{{.Artist.Name}} &mdash; Groupie Tracker{{end}}
+
+{{define "main"}}
+<nav class="breadcrumb">
+    <a href="/artists/" class="breadcrumb__link">&larr; All Artists</a>
+</nav>
+
+<article class="artist-detail">
+    <header class="artist-detail__header">
+        <div class="artist-detail__image-wrapper">
+            <img
+                src="{{.Artist.Image}}"
+                alt="{{.Artist.Name}}"
+                class="artist-detail__image"
+                width="400"
+                height="400"
+            >
+        </div>
+        <div class="artist-detail__intro">
+            <h1 class="artist-detail__name">{{.Artist.Name}}</h1>
+            <dl class="artist-detail__meta">
+                <div class="meta-row">
+                    <dt>Formed</dt>
+                    <dd>{{.Artist.CreationDate}}</dd>
+                </div>
+                <div class="meta-row">
+                    <dt>First Album</dt>
+                    <dd>{{.Artist.FirstAlbum}}</dd>
+                </div>
+            </dl>
+            <div class="artist-detail__members">
+                <h2 class="section-label">Members</h2>
+                <ul class="members-list">
+                    {{range .Artist.Members}}
+                    <li class="members-list__item">{{.}}</li>
+                    {{end}}
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <section class="concerts-section">
+        <h2 class="section-title">Concert Dates</h2>
+        <div class="concerts-grid">
+            {{range $location, $dates := .Relations.DatesLocations}}
+            <div class="concert-card">
+                <h3 class="concert-card__location">{{$location}}</h3>
+                <ul class="concert-card__dates">
+                    {{range $dates}}
+                    <li class="concert-card__date">{{.}}</li>
+                    {{end}}
+                </ul>
+            </div>
+            {{end}}
+        </div>
+    </section>
+</article>
+{{end}}

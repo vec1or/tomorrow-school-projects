@@ -1,0 +1,386 @@
+:root {
+    --bg:           #0e0e0e;
+    --bg-card:      #161616;
+    --bg-card-hover:#1e1e1e;
+    --border:       #2a2a2a;
+    --border-hover: #c9a84c;
+
+    --text-primary: #f0ece3;
+    --text-muted:   #E5E4E2;
+    --text-label:   #c9a84c;   /* gold accent */
+
+    --accent:       #c9a84c;
+    --accent-dim:   rgba(201, 168, 76, 0.12);
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+
+    --radius:       4px;
+    --transition:   200ms ease;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+.site-main {
+    flex: 1;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+}
+
+/* Header */
+.site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    position: sticky;
+    top: 0;
+    background-color: rgba(14, 14, 14, 0.92);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+}
+
+.site-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+    transition: color var(--transition);
+}
+
+.site-logo:hover {
+    color: var(--accent);
+}
+
+.logo-mark {
+    color: var(--accent);
+    font-size: 1.3rem;
+}
+
+/*  Footer */
+.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* artists list */
+.page-header {
+    padding: 3rem 0 2.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+.page-subtitle {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.artists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.artist-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition:
+        border-color var(--transition),
+        background var(--transition),
+        transform var(--transition);
+}
+
+.artist-card:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-card-hover);
+    transform: translateY(-3px);
+}
+
+.artist-card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.artist-card__image-wrapper {
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    background: #111;
+}
+
+.artist-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 400ms ease;
+    filter: grayscale(20%);
+}
+
+.artist-card:hover .artist-card__image {
+    transform: scale(1.04);
+    filter: grayscale(0%);
+}
+
+.artist-card__body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.artist-card__name {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+}
+
+.artist-card__meta,
+.artist-detail__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.meta-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+}
+
+.meta-row dt {
+    color: var(--text-label);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    min-width: 6rem;
+}
+
+.meta-row dd {
+    color: var(--text-muted);
+}
+
+.breadcrumb {
+    margin-bottom: 2.5rem;
+}
+
+.breadcrumb__link {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color var(--transition);
+}
+
+.breadcrumb__link:hover {
+    color: var(--accent);
+}
+
+.artist-detail__header {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 4rem;
+}
+
+@media (max-width: 720px) {
+    .artist-detail__header {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+.artist-detail__image-wrapper {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+}
+
+.artist-detail__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(15%);
+    transition: filter 400ms ease;
+}
+
+.artist-detail__image:hover {
+    filter: grayscale(0%);
+}
+
+.artist-detail__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding-top: 0.5rem;
+}
+
+.artist-detail__name {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+}
+
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.members-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.members-list__item {
+    background: var(--accent-dim);
+    border: 1px solid rgba(201, 168, 76, 0.25);
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0.75rem;
+    border-radius: 2px;
+    text-transform: uppercase;
+}
+
+.concerts-section {
+    margin-top: 1rem;
+}
+
+.concerts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.concert-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    transition: border-color var(--transition);
+}
+
+.concert-card:hover {
+    border-color: var(--border-hover);
+}
+
+.concert-card__location {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.concert-card__dates {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.concert-card__date {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    padding-left: 0.75rem;
+    position: relative;
+}
+
+.concert-card__date::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+}
+
+@media (max-width: 480px) {
+    .artists-grid {
+        grid-template-columns: 1fr;
+    }
+    .concerts-grid {
+        grid-template-columns: 1fr;
+    }
+}

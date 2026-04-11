@@ -1,0 +1,46 @@
+{{template "base" .}}
+
+{{define "title"}}Artists &mdash; Groupie Tracker{{end}}
+
+{{define "main"}}
+<section class="page-header">
+    <h1 class="page-title">Artists</h1>
+    <p class="page-subtitle">{{len .}} acts in the database</p>
+</section>
+
+<section class="artists-grid">
+    {{range .}}
+    <article class="artist-card">
+        <a href="/artists/{{.ID}}" class="artist-card__link">
+            <div class="artist-card__image-wrapper">
+                <img
+                    src="{{.Image}}"
+                    alt="{{.Name}}"
+                    class="artist-card__image"
+                    loading="lazy"
+                    width="300"
+                    height="300"
+                >
+            </div>
+            <div class="artist-card__body">
+                <h2 class="artist-card__name">{{.Name}}</h2>
+                <dl class="artist-card__meta">
+                    <div class="meta-row">
+                        <dt>Formed</dt>
+                        <dd>{{.CreationDate}}</dd>
+                    </div>
+                    <div class="meta-row">
+                        <dt>Members</dt>
+                        <dd>{{len .Members}}</dd>
+                    </div>
+                    <div class="meta-row">
+                        <dt>First Album</dt>
+                        <dd>{{.FirstAlbum}}</dd>
+                    </div>
+                </dl>
+            </div>
+        </a>
+    </article>
+    {{end}}
+</section>
+{{end}}
