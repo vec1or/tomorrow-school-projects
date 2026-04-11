@@ -1,16 +1,19 @@
 package middleware
 
 import (
-	"log/slog"
+	"fmt"
 	"net/http"
 	"time"
+
+	"groupie-tracker/internal/config"
 )
 
-func Recovery(logger *slog.Logger, next http.Handler) http.Handler {
+func RecoverPanic(app *config.Application, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
-			if rec := recover(); rec != nil {
-				logger.Error("Panic!", "Error", rec)
+			if err := recover(); err != nil {
+				w.Header().Set("Conneciton", "close")
+				app.Logger.Error(fmt.Sprintf("%s", err), "method", r.Method, "uri", r.URL.RequestURI())
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			}
 		}()
@@ -18,25 +21,32 @@ func Recovery(logger *slog.Logger, next http.Handler) http.Handler {
 	})
 }
 
-func Logging(logger *slog.Logger, next http.Handler) http.Handler {
+func LogRequest(app *config.Application, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		startTime := time.Now()
+		start := time.Now()
 		next.ServeHTTP(w, r)
-		EndTime := time.Since(startTime)
-		logger.Info("Request handled", "Method", r.Method,
-			"Path", r.URL.Path,
-			"Duration", EndTime)
+		app.Logger.Info("request", "method", r.Method, "uri", r.URL.RequestURI(), "duration", time.Since(start))
 	})
 }
 
-func AllowMethods(methods []string, next http.Handler) http.Handler {
+func AllowMethods(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		for _, val := range methods {
-			if r.Method == val {
-				next.ServeHTTP(w, r)
-				return
-			}
+		if r.Method != http.MethodGet {
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
 		}
-		http.Error(w, "Method Not Allowed!", http.StatusMethodNotAllowed)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func SecureHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' *")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "deny")
+		w.Header().Set("X-XSS-Protection", "0")
+		w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
+
+		next.ServeHTTP(w, r)
 	})
 }
