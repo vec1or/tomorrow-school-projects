@@ -65,3 +65,15 @@ The project follows a layered architecture:
 - Go (standard library only)
 - HTML templates
 - CSS
+
+## How to test
+
+```bash
+go test ./internal/server/
+go test ./internal/service/
+go test ./internal/repository/
+```
+Or all in one command:
+```bash
+go test ./...
+```
