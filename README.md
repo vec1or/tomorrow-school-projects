@@ -77,3 +77,9 @@ Or all in one command:
 ```bash
 go test ./...
 ```
+
+Contact
+
+Liya Sabit #lsabit
+Bakhtiyar Kalzhan #bkalzhan
+Danial Kalzhan #dkalzhan
