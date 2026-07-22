@@ -265,3 +265,5 @@ Let `V` be the number of rooms, `E` the number of tunnels, and `K` the maximum n
 The pathfinder performs at most `K` augmentations. Each augmentation uses Dijkstra's algorithm on the split flow graph, followed by path extraction and evaluation. The simulation cost is proportional to the number of printed ant movements.
 
 The implementation avoids enumerating all possible simple paths, which would become impractical on large colonies containing many branches and cycles.
+
+Credits: #dkalzhan #unurlanky
