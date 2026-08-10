@@ -1,49 +1,19 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"log"
 	"net/http"
-	"strconv"
+	//"strconv"
 )
-
-func home(w http.ResponseWriter, r *http.Request) {
-
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	w.Write([]byte("Hello from Snippetbox"))
-}
-
-func snippetView(w http.ResponseWriter, r *http.Request) {
-
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
-	if err != nil || id < 1 {
-		http.NotFound(w, r)
-		return
-	}
-
-	//w.Write([]byte("Display a specific snippet..."))
-
-	fmt.Fprintf(w, "Display a specific snippet with ID: %d", id)
-}
-
-func snippetCreate(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != "POST" {
-		w.Header().Set("Allow", http.MethodPost)
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		//w.WriteHeader(http.StatusMethodNotAllowed)
-		//w.Write([]byte("Method not allowed"))
-		return
-	}
-
-	w.Write([]byte("Create a new snippet..."))
-}
 
 func main() {
 	mux := http.NewServeMux()
+
+	fileServer := http.FileServer(http.Dir("./ui/static/"))
+
+	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+
 	mux.HandleFunc("/", home)
 	mux.HandleFunc("/snippet/view", snippetView)
 	mux.HandleFunc("/snippet/create", snippetCreate)
