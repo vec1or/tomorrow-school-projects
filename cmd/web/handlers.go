@@ -1,14 +1,13 @@
 package main
 
-import(
+import (
 	"fmt"
 	"net/http"
 	"strconv"
+
 	//"log"
 	"html/template"
 )
-
-
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
@@ -18,9 +17,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files := []string{
-	"./ui/html/base.tmpl",
-	"./ui/html/partials/nav.tmpl",
-	"./ui/html/pages/home.tmpl",
+		"./ui/html/base.tmpl",
+		"./ui/html/partials/nav.tmpl",
+		"./ui/html/pages/home.tmpl",
 	}
 
 	// ts, err := template.ParseFiles("./ui/html/pages/home.tmpl")
@@ -46,12 +45,10 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 	}
 
-
 	//w.Write([]byte("Hello from Snippetbox"))
 }
 
-func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
-
+func (app *application) postView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil || id < 1 {
 		app.notFound(w)
@@ -59,13 +56,18 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//w.Write([]byte("Display a specific snippet..."))
+	post, err := app.posts.GetByID(id)
+	if err != nil {
+		app.notFound(w)
+		return
+	}
 
-	fmt.Fprintf(w, "Display a specific snippet with ID: %d", id)
+	fmt.Fprintf(w, "ID: %d | Title: %s | Content: %s", post.ID, post.Title, post.Content)
 }
 
-func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
+func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
 		app.clientError(w, http.StatusMethodNotAllowed)
 		//w.WriteHeader(http.StatusMethodNotAllowed)
@@ -73,5 +75,15 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("Create a new snippet..."))
+	userID := 1 // temp
+	title := "Test title"
+	content := "Test content"
+
+	id, err := app.posts.Insert(userID, title, content)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", id), http.StatusSeeOther)
 }

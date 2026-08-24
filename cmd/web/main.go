@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"forum/internal/models"
 
 	//"fmt"
 	"log"
@@ -17,7 +18,7 @@ import (
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
-	db       *sql.DB
+	posts    *models.PostModel
 }
 
 func main() {
@@ -50,7 +51,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
-		db:       db,
+		posts:    &models.PostModel{DB: db},
 	}
 
 	srv := &http.Server{
