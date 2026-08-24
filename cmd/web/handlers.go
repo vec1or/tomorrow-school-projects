@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
-
 	//"log"
-	"html/template"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -14,6 +13,19 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		app.notFound(w)
 		return
+	}
+
+	posts, err := app.posts.Latest()
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	// for _, post := range posts {
+	// 	fmt.Fprintf(w, "%+v\n", post)
+	// }
+
+	data := &templateData{
+		Posts: posts,
 	}
 
 	files := []string{
@@ -40,7 +52,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// 	http.Error(w, "Internal server error", 500)
 	// }
 
-	err = ts.ExecuteTemplate(w, "base", nil)
+	err = ts.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
 	}
@@ -62,7 +74,28 @@ func (app *application) postView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "ID: %d | Title: %s | Content: %s", post.ID, post.Title, post.Content)
+	files := []string{
+		"./ui/html/base.tmpl",
+		"./ui/html/partials/nav.tmpl",
+		"./ui/html/pages/view.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := &templateData{
+		Post: post,
+	}
+
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	//fmt.Fprintf(w, "ID: %d | Title: %s | Content: %s", post.ID, post.Title, post.Content)
 }
 
 func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {

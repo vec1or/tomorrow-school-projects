@@ -1,6 +1,17 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-    <h2>Latest Snippets</h2>
-    <p>There's nothing to see here yet!</p>
+    <h2>Latest Posts</h2>
+    {{if .Posts}}
+        <ul>
+            {{range .Posts}}
+                <li>
+                    <a href='/post/view?id={{.ID}}'>{{.Title}}</a>
+                    <span>{{.CreatedAt}}</span>
+                </li>
+            {{end}}
+        </ul>
+    {{else}}
+        <p>There's nothing to see here yet!</p>
+    {{end}}
 {{end}}

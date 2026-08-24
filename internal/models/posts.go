@@ -48,3 +48,31 @@ func (m *PostModel) GetByID(id int) (*Post, error) {
 	}
 	return p, nil
 }
+
+func (m *PostModel) Latest() ([]*Post, error) {
+	stmt := `SELECT id, user_id, title, content, created_at 
+					FROM posts
+					ORDER BY created_at DESC`
+
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []*Post
+
+	for rows.Next() {
+		p := &Post{}
+		err = rows.Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
