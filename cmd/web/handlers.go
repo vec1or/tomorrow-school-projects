@@ -1,8 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"html/template"
+	"forum/internal/models"
 	"net/http"
 	"strconv"
 	//"log"
@@ -20,44 +21,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 	}
 
-	// for _, post := range posts {
-	// 	fmt.Fprintf(w, "%+v\n", post)
-	// }
-
 	data := &templateData{
 		Posts: posts,
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/pages/home.tmpl",
-	}
-
-	// ts, err := template.ParseFiles("./ui/html/pages/home.tmpl")
-	// if err != nil {
-	// 	log.Print(err.Error())
-	// 	http.Error(w, "Internal server error", 500)
-	// 	return
-	// }
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	// err = ts.Execute(w, nil)
-	// if err != nil {
-	// 	log.Print(err.Error())
-	// 	http.Error(w, "Internal server error", 500)
-	// }
-
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	//w.Write([]byte("Hello from Snippetbox"))
+	app.render(w, http.StatusOK, "home.tmpl", data)
 }
 
 func (app *application) postView(w http.ResponseWriter, r *http.Request) {
@@ -67,21 +35,12 @@ func (app *application) postView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//w.Write([]byte("Display a specific snippet..."))
 	post, err := app.posts.GetByID(id)
 	if err != nil {
-		app.notFound(w)
-		return
-	}
-
-	files := []string{
-		"./ui/html/base.tmpl",
-		"./ui/html/partials/nav.tmpl",
-		"./ui/html/pages/view.tmpl",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+			return
+		}
 		app.serverError(w, err)
 		return
 	}
@@ -90,12 +49,7 @@ func (app *application) postView(w http.ResponseWriter, r *http.Request) {
 		Post: post,
 	}
 
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	//fmt.Fprintf(w, "ID: %d | Title: %s | Content: %s", post.ID, post.Title, post.Content)
+	app.render(w, http.StatusOK, "view.tmpl", data)
 }
 
 func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {

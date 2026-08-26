@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"forum/internal/models"
+	"html/template"
 
 	//"fmt"
 	"log"
@@ -16,9 +17,10 @@ import (
 )
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	posts    *models.PostModel
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	posts         *models.PostModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -37,6 +39,11 @@ func main() {
 	}
 	defer db.Close()
 
+	templateCache, err := NewTemplateCache()
+	if err != nil {
+		errorLog.Fatal()
+	}
+
 	query, err := os.ReadFile("schema.sql")
 	if err != nil {
 		errorLog.Fatalf("Couldn't read schema.sql: %v", err)
@@ -49,9 +56,10 @@ func main() {
 	infoLog.Println("DataBase scheme used successfuly")
 
 	app := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-		posts:    &models.PostModel{DB: db},
+		errorLog:      errorLog,
+		infoLog:       infoLog,
+		posts:         &models.PostModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	srv := &http.Server{
