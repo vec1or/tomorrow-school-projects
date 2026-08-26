@@ -2,9 +2,12 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"strconv"
+	"time"
 )
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -38,4 +41,18 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 	}
 	w.WriteHeader(status)
 	buf.WriteTo(w)
+}
+
+func (app *application) newTemplateData(r *http.Request) *templateData {
+	return &templateData{
+		CurrentYear: time.Now().Year(),
+	}
+}
+
+func (app *application) readIDParam(r *http.Request) (int, error) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		return 0, errors.New("invalid id parameter")
+	}
+	return id, nil
 }
