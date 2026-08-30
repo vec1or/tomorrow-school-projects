@@ -152,3 +152,55 @@ func (app *application) userSignupPost (w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
+type userLoginForm struct {
+	Email string `form:"email"`
+	Password string `form:"password"`
+	validator.Validator `form:"-"`
+}
+
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = userLoginForm{}
+	app.render(w, http.StatusOK, "login.tmpl", data)
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	var form userLoginForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.Username = r.PostForm.Get("username")
+	form.Email = r.PostForm.Get("email")
+	form.Password = r.PostForm.Get("password")
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+	
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
+		return
+	}
+
+	id, err := app.users.Authenticate(form.email, form.password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddFieldError("email", "Email or password is incorrect")
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	_ = id
+
+	http.Redirect(w, r, "/", http.StatusOK)
+}
