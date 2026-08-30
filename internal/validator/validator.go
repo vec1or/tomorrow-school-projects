@@ -3,6 +3,7 @@ package validator
 import (
 	"strings"
 	"unicode/utf8"
+	"regexp"
 )
 
 type Validator struct {
@@ -18,6 +19,10 @@ func (v *Validator) Valid() bool {
 }
 
 func (v *Validator) AddFieldError(key, message string) {
+
+	if v.FieldErrors == nil {
+		v.FieldErrors = make(map[string]string)
+	}
 	if _, exists := v.FieldErrors[key]; !exists {
 		v.FieldErrors[key] = message
 	}
@@ -35,4 +40,14 @@ func NotBlank(value string) bool {
 
 func MaxChars(value string, n int) bool {
 	return utf8.RuneCountInString(value) <= n
+}
+
+func MinChars(value string, n int) bool {
+	return utf8.RuneCountInString(value) >= n
+}
+
+var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
+func Matches(value string, rx *regexp.Regexp) bool {
+	return rx.MatchString(value)
 }

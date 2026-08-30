@@ -64,17 +64,16 @@ type postCreateForm struct {
 }
 
 func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
+	var form postCreateForm
 
-	err := r.ParseForm()
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	form := postCreateForm{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-	}
+	form.Title = r.PostForm.Get("title")
+	form.Content = r.PostForm.Get("content")
 
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
 	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 charcters long")
@@ -95,3 +94,61 @@ func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, fmt.Sprintf("/post/view/%d", id), http.StatusSeeOther)
 }
+
+type userSignupForm struct {
+	Username string `form:"username`
+	Email string `form:"email`
+	Password string `form:"password`
+	validator.Validator `form:"-"`
+}
+
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = userSignupForm{}
+	app.render(w, http.StatusOK, "signup.tmpl", data)
+}
+
+func (app *application) userSignupPost (w http.ResponseWriter, r *http.Request) {
+	var form userSignupForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+	}
+
+	form.Username = r.PostForm.Get("username")
+	form.Email = r.PostForm.Get("email")
+	form.Password = r.PostForm.Get("password")
+
+	form.CheckField(validator.NotBlank(form.Username), "username", "This field cannot be blank")
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
+		return
+	}
+
+	err = app.users.Insert(form.Username, form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrDublicateEmail) {
+			form.AddFieldError("email", "Email address is already in use")
+		} else if errors.Is(err, models.ErrDublicateUsername) {
+			form.AddFieldError("username", "Username address is already in use")
+		} else {
+			app.serverError(w, err)
+			return
+		}
+
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
+		return
+	}
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+

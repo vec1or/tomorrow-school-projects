@@ -56,3 +56,11 @@ func (app *application) readIDParam(r *http.Request) (int, error) {
 	}
 	return id, nil
 }
+
+func (app *application) decodePostForm(r *http.Request, dst any) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+	return nil
+}
