@@ -11,6 +11,7 @@ type templateData struct {
 	CurrentYear int
 	Post        *models.Post
 	Posts       []*models.Post
+	Comments    []*models.Comment
 	Form        any
 }
 

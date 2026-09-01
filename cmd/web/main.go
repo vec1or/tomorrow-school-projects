@@ -20,7 +20,10 @@ type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
 	posts         *models.PostModel
-	users		  *models.UserModel
+	users         *models.UserModel
+	categories    *models.CategoryModel
+	comments      *models.CommentModel
+	reactions     *models.ReactionModel
 	templateCache map[string]*template.Template
 }
 
@@ -61,6 +64,9 @@ func main() {
 		infoLog:       infoLog,
 		posts:         &models.PostModel{DB: db},
 		users:         &models.UserModel{DB: db},
+		categories:    &models.CategoryModel{DB: db},
+		comments:      &models.CommentModel{DB: db},
+		reactions:     &models.ReactionModel{DB: db},
 		templateCache: templateCache,
 	}
 
