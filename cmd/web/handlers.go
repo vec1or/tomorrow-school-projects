@@ -39,8 +39,15 @@ func (app *application) postView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	comments, err := app.comments.ByPostID(id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
 	data := app.newTemplateData(r)
 	data.Post = post
+	data.Comments = comments
 
 	app.render(w, http.StatusOK, "view.tmpl", data)
 }
@@ -91,9 +98,9 @@ func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 type userSignupForm struct {
-	Username            string `form:"username"`
-	Email               string `form:"email"`
-	Password            string `form:"password"`
+	Username string `form:"username`
+	Email string `form:"email`
+	Password string `form:"password`
 	validator.Validator `form:"-"`
 }
 
@@ -169,7 +176,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//	form.Username = r.PostForm.Get("username")
+	form.Username = r.PostForm.Get("username")
 	form.Email = r.PostForm.Get("email")
 	form.Password = r.PostForm.Get("password")
 
