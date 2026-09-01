@@ -3,17 +3,18 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"time"
 	"strings"
+	"time"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID int
-	Username string
-	Email string
+	ID             int
+	Username       string
+	Email          string
 	HashedPassword []byte
-	CreatedAt time.Time
+	CreatedAt      time.Time
 }
 
 type UserModel struct {
@@ -32,10 +33,10 @@ func (m *UserModel) Insert(username, email, password string) error {
 	_, err = m.DB.Exec(stmt, username, email, string(hashedPassword))
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE constraint failed: users.email") {
-			return ErrDublicateEmail
+			return ErrDuplicateEmail
 		}
 		if strings.Contains(err.Error(), "UNIQUE constraint failed: users.username") {
-			return ErrDublicateUsername
+			return ErrDuplicateUsername
 		}
 		return err
 	}
@@ -47,7 +48,7 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 	var id int
 	var hashedPassword []byte
 
-	stmt := `SELECT id, password FROM users WHERE email ?`
+	stmt := `SELECT id, password FROM users WHERE email = ?`
 	err := m.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

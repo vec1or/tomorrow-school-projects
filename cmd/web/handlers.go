@@ -11,11 +11,6 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
-	if r.URL.Path != "/" {
-		app.notFound(w)
-		return
-	}
-
 	posts, err := app.posts.Latest()
 	if err != nil {
 		app.serverError(w, err)
@@ -96,9 +91,9 @@ func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 type userSignupForm struct {
-	Username string `form:"username`
-	Email string `form:"email`
-	Password string `form:"password`
+	Username            string `form:"username"`
+	Email               string `form:"email"`
+	Password            string `form:"password"`
 	validator.Validator `form:"-"`
 }
 
@@ -108,12 +103,13 @@ func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "signup.tmpl", data)
 }
 
-func (app *application) userSignupPost (w http.ResponseWriter, r *http.Request) {
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	var form userSignupForm
 
 	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
+		return
 	}
 
 	form.Username = r.PostForm.Get("username")
@@ -135,9 +131,9 @@ func (app *application) userSignupPost (w http.ResponseWriter, r *http.Request) 
 
 	err = app.users.Insert(form.Username, form.Email, form.Password)
 	if err != nil {
-		if errors.Is(err, models.ErrDublicateEmail) {
+		if errors.Is(err, models.ErrDuplicateEmail) {
 			form.AddFieldError("email", "Email address is already in use")
-		} else if errors.Is(err, models.ErrDublicateUsername) {
+		} else if errors.Is(err, models.ErrDuplicateUsername) {
 			form.AddFieldError("username", "Username address is already in use")
 		} else {
 			app.serverError(w, err)
@@ -153,8 +149,8 @@ func (app *application) userSignupPost (w http.ResponseWriter, r *http.Request) 
 }
 
 type userLoginForm struct {
-	Email string `form:"email"`
-	Password string `form:"password"`
+	Email               string `form:"email"`
+	Password            string `form:"password"`
 	validator.Validator `form:"-"`
 }
 
@@ -173,14 +169,14 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form.Username = r.PostForm.Get("username")
+	//	form.Username = r.PostForm.Get("username")
 	form.Email = r.PostForm.Get("email")
 	form.Password = r.PostForm.Get("password")
 
 	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
 	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
 	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
-	
+
 	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.Form = form
@@ -188,7 +184,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := app.users.Authenticate(form.email, form.password)
+	id, err := app.users.Authenticate(form.Email, form.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
 			form.AddFieldError("email", "Email or password is incorrect")
@@ -202,5 +198,5 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = id
 
-	http.Redirect(w, r, "/", http.StatusOK)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
