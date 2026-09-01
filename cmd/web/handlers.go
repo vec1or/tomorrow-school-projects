@@ -98,9 +98,9 @@ func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 type userSignupForm struct {
-	Username string `form:"username`
-	Email string `form:"email`
-	Password string `form:"password`
+	Username string `form:"username"`
+	Email    string `form:"email"`
+	Password string `form:"password"`
 	validator.Validator `form:"-"`
 }
 
@@ -176,7 +176,6 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form.Username = r.PostForm.Get("username")
 	form.Email = r.PostForm.Get("email")
 	form.Password = r.PostForm.Get("password")
 
