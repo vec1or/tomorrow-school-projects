@@ -88,7 +88,8 @@ func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 		app.render(w, http.StatusUnprocessableEntity, "create.tmpl", data)
 		return
 	}
-	userID := 1
+	userID := app.contextGetUserID(r)
+
 	id, err := app.posts.Insert(userID, form.Title, form.Content)
 	if err != nil {
 		app.serverError(w, err)
@@ -177,6 +178,8 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.infoLog.Printf("DECODE VALUES: Email='%s', Password='%s'", form.Email, form.Password)
+
 	form.Email = r.PostForm.Get("email")
 	form.Password = r.PostForm.Get("password")
 
@@ -214,6 +217,24 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		Value: token,
 		Path: "/",
 		Expires: time.Now().Add(24*time.Hour),
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_token")
+	if err == nil {
+		_ = app.sessions.Delete(cookie.Value)
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name: "session_token",
+		Value: "",
+		Path: "/",
+		Expires: time.Unix(0, 0),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	})
