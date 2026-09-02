@@ -9,6 +9,7 @@ import (
 
 type templateData struct {
 	CurrentYear int
+	IsAuthenticated bool
 	Post        *models.Post
 	Posts       []*models.Post
 	Comments    []*models.Comment

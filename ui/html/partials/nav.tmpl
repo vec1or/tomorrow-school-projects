@@ -1,5 +1,13 @@
 {{define "nav"}}
 <nav>
     <a href='/'>Home</a>
+    {{if .IsAuthenticated}}
+        <form action='/user/logout' method='POST'>
+            <button type='submit'>Logout</button>
+        </form>
+    {{else}}
+        <a href='/user/login'>Login</a>
+        <a href='/user/signup'>Signup</a>
+    {{end}}
 </nav>
 {{end}}
