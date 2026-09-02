@@ -83,3 +83,10 @@ VALUES
     (1, 1, 1, 'like', CURRENT_TIMESTAMP),
     (2, 1, 2, 'dislike', CURRENT_TIMESTAMP),
     (3, 1, 3, 'like', CURRENT_TIMESTAMP);
+
+    CREATE TABLE IF NOT EXISTS sessions (
+        token TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        expiry DATETIME NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )

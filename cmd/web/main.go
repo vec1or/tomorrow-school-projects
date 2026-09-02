@@ -24,6 +24,7 @@ type application struct {
 	categories    *models.CategoryModel
 	comments      *models.CommentModel
 	reactions     *models.ReactionModel
+	sessions *models.SessionModel
 	templateCache map[string]*template.Template
 }
 
@@ -67,6 +68,7 @@ func main() {
 		categories:    &models.CategoryModel{DB: db},
 		comments:      &models.CommentModel{DB: db},
 		reactions:     &models.ReactionModel{DB: db},
+		sessions: &models.SessionModel{DB: db},
 		templateCache: templateCache,
 	}
 

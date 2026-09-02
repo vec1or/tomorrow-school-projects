@@ -6,7 +6,7 @@ import (
 	"forum/internal/models"
 	"forum/internal/validator"
 	"net/http"
-	//"log"
+	"time"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -14,6 +14,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	posts, err := app.posts.Latest()
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
 
 	data := app.newTemplateData(r)
@@ -202,7 +203,20 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	_ = id
+	token, err := app.sessions.Insert(id, 24*time.Hour)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name: "session_token",
+		Value: token,
+		Path: "/",
+		Expires: time.Now().Add(24*time.Hour),
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
