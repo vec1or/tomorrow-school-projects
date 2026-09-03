@@ -1,6 +1,6 @@
 package models
 
-import(
+import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/base64"
@@ -9,8 +9,8 @@ import(
 )
 
 type Session struct {
-	Token string
-	UserID int 
+	Token  string
+	UserID int
 	Expiry time.Time
 }
 
@@ -34,13 +34,23 @@ func (m *SessionModel) Insert(userID int, duration time.Duration) (string, error
 	}
 
 	expiry := time.Now().Add(duration)
-	stmt := `INSERT INTO sessions (token, user_id, expiry) VALUES (?, ?, ?)`
-
-	_, err = m.DB.Exec(stmt, token, userID, expiry)
+	tx, err := m.DB.Begin()
 	if err != nil {
 		return "", err
 	}
+	defer tx.Rollback()
 
+	// Keep only one active session per user, as required by the audit.
+	if _, err = tx.Exec(`DELETE FROM sessions WHERE user_id = ?`, userID); err != nil {
+		return "", err
+	}
+	_, err = tx.Exec(`INSERT INTO sessions (token, user_id, expiry) VALUES (?, ?, ?)`, token, userID, expiry)
+	if err != nil {
+		return "", err
+	}
+	if err = tx.Commit(); err != nil {
+		return "", err
+	}
 	return token, nil
 }
 

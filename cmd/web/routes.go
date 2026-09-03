@@ -17,6 +17,9 @@ func (app *application) routes() http.Handler {
 
 	mux.Handle("GET /post/create", app.requireAuthentication(http.HandlerFunc(app.postCreateForm)))
 	mux.Handle("POST /post/create", app.requireAuthentication(http.HandlerFunc(app.postCreate)))
+	mux.Handle("POST /post/view/{id}/comment", app.requireAuthentication(http.HandlerFunc(app.commentCreate)))
+	mux.Handle("POST /post/view/{id}/reaction", app.requireAuthentication(http.HandlerFunc(app.postReaction)))
+	mux.Handle("POST /comment/{id}/reaction", app.requireAuthentication(http.HandlerFunc(app.commentReaction)))
 	mux.Handle("POST /user/logout", app.requireAuthentication(http.HandlerFunc(app.userLogoutPost)))
 
 	return app.recoverPanic(app.logRequests(secureHeaders(app.authenticate(mux))))

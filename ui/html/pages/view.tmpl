@@ -9,32 +9,71 @@
                     <a href='/'>&larr; All discussions</a>
                     <span>Topic #{{.ID}}</span>
                 </div>
+                <div class='category-tags thread-tags'>
+                    {{range .Categories}}<a href='/?category={{.ID}}'>{{.Name}}</a>{{end}}
+                </div>
                 <h1>{{.Title}}</h1>
                 <div class='post-meta'>
-                    <span class='avatar-placeholder'>U</span>
-                    <span>User {{.UserID}}</span>
+                    <span class='avatar-placeholder'>{{printf "%.1s" .Username}}</span>
+                    <span>{{.Username}}</span>
                     <span class='meta-dot'>&bull;</span>
                     <time datetime='{{.CreatedAt}}'>{{humandate .CreatedAt}}</time>
                 </div>
                 <div class='thread-content'>{{.Content}}</div>
+                <div class='reaction-bar'>
+                    {{if $.IsAuthenticated}}
+                        <form action='/post/view/{{.ID}}/reaction' method='POST'>
+                            <button class='reaction-button like' type='submit' name='reaction' value='like' aria-label='Like this post'>&uarr; <span>Like</span> <strong>{{.LikeCount}}</strong></button>
+                            <button class='reaction-button dislike' type='submit' name='reaction' value='dislike' aria-label='Dislike this post'>&darr; <span>Dislike</span> <strong>{{.DislikeCount}}</strong></button>
+                        </form>
+                    {{else}}
+                        <span class='reaction-count'>&uarr; {{.LikeCount}} likes</span>
+                        <span class='reaction-count'>&darr; {{.DislikeCount}} dislikes</span>
+                        <a class='reaction-login' href='/user/login'>Log in to react</a>
+                    {{end}}
+                </div>
             </article>
         {{end}}
 
-        <section class='comments-section'>
+        <section class='comments-section' id='comments'>
             <div class='section-heading compact'>
                 <h2>Comments</h2>
-                {{if .Comments}}<span class='count-badge'>{{len .Comments}}</span>{{end}}
+                <span class='count-badge'>{{len .Comments}}</span>
             </div>
+
+            {{if .IsAuthenticated}}
+                <form class='comment-form' action='/post/view/{{.Post.ID}}/comment' method='POST'>
+                    <label for='comment-content'>Join the discussion</label>
+                    {{with .Form.FieldErrors.content}}<span class='field-error'>{{.}}</span>{{end}}
+                    <textarea id='comment-content' name='content' maxlength='2000' placeholder='Write a thoughtful reply...'>{{.Form.Content}}</textarea>
+                    <div class='comment-form-footer'>
+                        <span>Maximum 2000 characters</span>
+                        <button class='button button-small' type='submit'>Post comment</button>
+                    </div>
+                </form>
+            {{else}}
+                <div class='login-prompt'><span>Want to join the conversation?</span><a href='/user/login'>Log in to comment</a></div>
+            {{end}}
 
             {{if .Comments}}
                 <div class='comment-list'>
                     {{range .Comments}}
-                        <article class='comment-card'>
+                        <article class='comment-card' id='comment-{{.ID}}'>
                             <div class='comment-author'>
                                 <span class='avatar-placeholder'>{{printf "%.1s" .Username}}</span>
                                 <div><strong>{{.Username}}</strong><time datetime='{{.CreatedAt}}'>{{humandate .CreatedAt}}</time></div>
                             </div>
                             <p>{{.Content}}</p>
+                            <div class='comment-reactions'>
+                                {{if $.IsAuthenticated}}
+                                    <form action='/comment/{{.ID}}/reaction' method='POST'>
+                                        <button class='reaction-button compact like' type='submit' name='reaction' value='like'>&uarr; {{.LikeCount}}</button>
+                                        <button class='reaction-button compact dislike' type='submit' name='reaction' value='dislike'>&darr; {{.DislikeCount}}</button>
+                                    </form>
+                                {{else}}
+                                    <span>&uarr; {{.LikeCount}}</span><span>&darr; {{.DislikeCount}}</span>
+                                {{end}}
+                            </div>
                         </article>
                     {{end}}
                 </div>

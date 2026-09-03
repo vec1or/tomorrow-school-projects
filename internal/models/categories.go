@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"errors"
 )
 
 type Category struct {
@@ -65,13 +64,29 @@ func (m *CategoryModel) ByPostID(postID int) ([]*Category, error) {
 	return categories, nil
 }
 
+func (m *CategoryModel) Exists(id int) (bool, error) {
+	var exists bool
+	err := m.DB.QueryRow(`SELECT EXISTS(SELECT 1 FROM categories WHERE id = ?)`, id).Scan(&exists)
+	return exists, err
+}
+
+func (m *CategoryModel) AllExist(ids []int) (bool, error) {
+	for _, id := range ids {
+		exists, err := m.Exists(id)
+		if err != nil {
+			return false, err
+		}
+		if !exists {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func (m *CategoryModel) Insert(name string) (int, error) {
 	stmt := `INSERT INTO categories (name) VALUES (?)`
 	result, err := m.DB.Exec(stmt, name)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return 0, err
-		}
 		return 0, err
 	}
 

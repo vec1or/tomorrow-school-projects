@@ -8,13 +8,16 @@ import (
 )
 
 type templateData struct {
-	CurrentYear     int
-	IsAuthenticated bool
-	Post            *models.Post
-	Posts           []*models.Post
-	Categories      []*models.Category
-	Comments        []*models.Comment
-	Form            any
+	CurrentYear         int
+	IsAuthenticated    bool
+	CurrentUserID       int
+	Post                *models.Post
+	Posts               []*models.Post
+	Categories          []*models.Category
+	Comments            []*models.Comment
+	ActiveFilter        string
+	SelectedCategoryID int
+	Form                any
 }
 
 func humanDate(t time.Time) string {
@@ -23,6 +26,14 @@ func humanDate(t time.Time) string {
 
 var functions = template.FuncMap{
 	"humandate": humanDate,
+	"containsInt": func(values []int, wanted int) bool {
+		for _, value := range values {
+			if value == wanted {
+				return true
+			}
+		}
+		return false
+	},
 }
 
 func NewTemplateCache() (map[string]*template.Template, error) {

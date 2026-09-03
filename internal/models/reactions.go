@@ -3,70 +3,64 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"time"
 )
 
-type Reaction struct {
-	ID           int
-	UserID       int
-	PostID       int
-	CommentID    int
-	ReactionType string
-	CreatedAt    time.Time
-}
+var ErrInvalidReaction = errors.New("models: invalid reaction type")
 
 type ReactionModel struct {
 	DB *sql.DB
 }
 
-func (m *ReactionModel) InsertForPost(userID, postID int, reactionType string) error {
-	stmt := `
-		INSERT INTO reactions (user_id, post_id, reaction_type, created_at)
-		VALUES (?, ?, ?, DATETIME('now'))
-		ON CONFLICT(user_id, post_id, comment_id) DO UPDATE SET reaction_type = excluded.reaction_type, created_at = DATETIME('now')`
-
-	_, err := m.DB.Exec(stmt, userID, postID, reactionType)
-	return err
+func validReaction(reactionType string) bool {
+	return reactionType == "like" || reactionType == "dislike"
 }
 
-func (m *ReactionModel) InsertForComment(userID, commentID int, reactionType string) error {
-	stmt := `
-		INSERT INTO reactions (user_id, comment_id, reaction_type, created_at)
-		VALUES (?, ?, ?, DATETIME('now'))
-		ON CONFLICT(user_id, post_id, comment_id) DO UPDATE SET reaction_type = excluded.reaction_type, created_at = DATETIME('now')`
-
-	_, err := m.DB.Exec(stmt, userID, commentID, reactionType)
-	return err
+// ToggleForPost creates a reaction, changes it, or removes it when the same
+// reaction is pressed for a second time.
+func (m *ReactionModel) ToggleForPost(userID, postID int, reactionType string) error {
+	if !validReaction(reactionType) {
+		return ErrInvalidReaction
+	}
+	return m.toggle(userID, postID, reactionType, true)
 }
 
-func (m *ReactionModel) CountForPost(postID int) (int, int, error) {
-	likesStmt := `SELECT COUNT(*) FROM reactions WHERE post_id = ? AND reaction_type = 'like'`
-	dislikesStmt := `SELECT COUNT(*) FROM reactions WHERE post_id = ? AND reaction_type = 'dislike'`
-
-	var likes, dislikes int
-	if err := m.DB.QueryRow(likesStmt, postID).Scan(&likes); err != nil {
-		return 0, 0, err
+func (m *ReactionModel) ToggleForComment(userID, commentID int, reactionType string) error {
+	if !validReaction(reactionType) {
+		return ErrInvalidReaction
 	}
-	if err := m.DB.QueryRow(dislikesStmt, postID).Scan(&dislikes); err != nil {
-		return 0, 0, err
-	}
-
-	return likes, dislikes, nil
+	return m.toggle(userID, commentID, reactionType, false)
 }
 
-func (m *ReactionModel) CountForComment(commentID int) (int, int, error) {
-	likesStmt := `SELECT COUNT(*) FROM reactions WHERE comment_id = ? AND reaction_type = 'like'`
-	dislikesStmt := `SELECT COUNT(*) FROM reactions WHERE comment_id = ? AND reaction_type = 'dislike'`
-
-	var likes, dislikes int
-	if err := m.DB.QueryRow(likesStmt, commentID).Scan(&likes); err != nil {
-		return 0, 0, err
+func (m *ReactionModel) toggle(userID, targetID int, reactionType string, isPost bool) error {
+	tx, err := m.DB.Begin()
+	if err != nil {
+		return err
 	}
-	if err := m.DB.QueryRow(dislikesStmt, commentID).Scan(&dislikes); err != nil {
-		return 0, 0, err
+	defer tx.Rollback()
+
+	targetColumn := "comment_id"
+	otherColumn := "post_id"
+	if isPost {
+		targetColumn = "post_id"
+		otherColumn = "comment_id"
 	}
 
-	return likes, dislikes, nil
+	var current string
+	err = tx.QueryRow(`SELECT reaction_type FROM reactions WHERE user_id = ? AND `+targetColumn+` = ?`, userID, targetID).Scan(&current)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		_, err = tx.Exec(`INSERT INTO reactions (user_id, `+targetColumn+`, `+otherColumn+`, reaction_type, created_at)
+			VALUES (?, ?, NULL, ?, DATETIME('now'))`, userID, targetID, reactionType)
+	case err != nil:
+		return err
+	case current == reactionType:
+		_, err = tx.Exec(`DELETE FROM reactions WHERE user_id = ? AND `+targetColumn+` = ?`, userID, targetID)
+	default:
+		_, err = tx.Exec(`UPDATE reactions SET reaction_type = ?, created_at = DATETIME('now')
+			WHERE user_id = ? AND `+targetColumn+` = ?`, reactionType, userID, targetID)
+	}
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
 }
-
-var ErrInvalidReaction = errors.New("models: invalid reaction type")

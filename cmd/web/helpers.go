@@ -45,9 +45,11 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 }
 
 func (app *application) newTemplateData(r *http.Request) *templateData {
+	userID := app.contextGetUserID(r)
 	return &templateData{
-		CurrentYear: time.Now().Year(),
-		IsAuthenticated: app.contextGetUserID(r) != 0,
+		CurrentYear:     time.Now().Year(),
+		IsAuthenticated: userID != 0,
+		CurrentUserID:   userID,
 	}
 }
 

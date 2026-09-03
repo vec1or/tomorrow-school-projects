@@ -5,12 +5,8 @@ import (
 	"flag"
 	"forum/internal/models"
 	"html/template"
-
-	//"fmt"
 	"log"
 	"net/http"
-
-	//"strconv"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -24,7 +20,7 @@ type application struct {
 	categories    *models.CategoryModel
 	comments      *models.CommentModel
 	reactions     *models.ReactionModel
-	sessions *models.SessionModel
+	sessions      *models.SessionModel
 	templateCache map[string]*template.Template
 }
 
@@ -46,7 +42,7 @@ func main() {
 
 	templateCache, err := NewTemplateCache()
 	if err != nil {
-		errorLog.Fatal()
+		errorLog.Fatal(err)
 	}
 
 	query, err := os.ReadFile("schema.sql")
@@ -58,7 +54,7 @@ func main() {
 	if err != nil {
 		errorLog.Fatalf("Couldn't execute schema.sql: %v", err)
 	}
-	infoLog.Println("DataBase scheme used successfuly")
+	infoLog.Println("Database schema applied successfully")
 
 	app := &application{
 		errorLog:      errorLog,
@@ -68,7 +64,7 @@ func main() {
 		categories:    &models.CategoryModel{DB: db},
 		comments:      &models.CommentModel{DB: db},
 		reactions:     &models.ReactionModel{DB: db},
-		sessions: &models.SessionModel{DB: db},
+		sessions:      &models.SessionModel{DB: db},
 		templateCache: templateCache,
 	}
 

@@ -1,9 +1,9 @@
 package validator
 
 import (
+	"regexp"
 	"strings"
 	"unicode/utf8"
-	"regexp"
 )
 
 type Validator struct {
