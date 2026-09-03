@@ -17,6 +17,14 @@
         <textarea name='content'>{{.Form.Content}}</textarea>
     </div>
     <div>
+        <label>Categories:</label>
+        {{with .Form.FieldErrors.category}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        {{range .Categories}}
+            <input type='checkbox' name='category' value='{{.ID}}'> {{.Name}}
+        {{end}}
+    <div>
         <input type='submit' value='Publish post'>
     </div>
 </form>

@@ -18,21 +18,40 @@ type PostModel struct {
 	DB *sql.DB
 }
 
-func (m *PostModel) Insert(userID int, title, content string) (int, error) {
-	stmt := `INSERT INTO posts (user_id, title, content, created_at)
+func (m *PostModel) Insert(userID int, title, content string, categoryIDs []int) (int, error) {
+	tx, err := m.DB.Begin()
+	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback()
+
+	stmt1 := `INSERT INTO posts (user_id, title, content, created_at)
 					VALUES(?, ?, ?, DATETIME('now'))`
 
-	result, err := m.DB.Exec(stmt, userID, title, content)
+	result, err := tx.Exec(stmt1, userID, title, content)
 	if err != nil {
 		return 0, err
 	}
 
-	id, err := result.LastInsertId()
+	postID, err := result.LastInsertId()
+	if err != nil {
+		return 0, nil
+	}
+
+	stmt2 := `INSERT INTO post_categories (post_id, category_id) VALUES(?, ?)`
+	for _, catID := range categoryIDs {
+		_, err := tx.Exec(stmt2, postID, catID)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return 0, err
 	}
 
-	return int(id), nil
+	return int(postID), nil
 }
 
 func (m *PostModel) GetByID(id int) (*Post, error) {

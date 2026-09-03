@@ -6,6 +6,7 @@ import (
 	"forum/internal/models"
 	"forum/internal/validator"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -53,17 +54,25 @@ func (app *application) postView(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "view.tmpl", data)
 }
 
-func (app *application) postCreateForm(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData(r)
-	data.Form = postCreateForm{}
-
-	app.render(w, http.StatusOK, "create.tmpl", data)
-}
-
 type postCreateForm struct {
 	Title               string
 	Content             string
+	CategoryIDs         []int
 	validator.Validator `form:"-"`
+}
+
+func (app *application) postCreateForm(w http.ResponseWriter, r *http.Request) {
+	categories, err := app.categories.All()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := app.newTemplateData(r)
+	data.Form = postCreateForm{}
+	data.Categories = categories
+
+	app.render(w, http.StatusOK, "create.tmpl", data)
 }
 
 func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
@@ -78,6 +87,16 @@ func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 	form.Title = r.PostForm.Get("title")
 	form.Content = r.PostForm.Get("content")
 
+	rawCategories := r.PostForm["category"]
+	var categoryIDs []int
+	for _, raw := range rawCategories {
+		id, err := strconv.Atoi(raw)
+		if err != nil {
+			categoryIDs = append(categoryIDs, id)
+		}
+	}
+	form.CategoryIDs = categoryIDs
+
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
 	form.CheckField(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 charcters long")
 	form.CheckField(validator.NotBlank(form.Content), "content", "This field cannot be blank")
@@ -90,7 +109,7 @@ func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	userID := app.contextGetUserID(r)
 
-	id, err := app.posts.Insert(userID, form.Title, form.Content)
+	id, err := app.posts.Insert(userID, form.Title, form.Content, form.CategoryIDs)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -100,9 +119,9 @@ func (app *application) postCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 type userSignupForm struct {
-	Username string `form:"username"`
-	Email    string `form:"email"`
-	Password string `form:"password"`
+	Username            string `form:"username"`
+	Email               string `form:"email"`
+	Password            string `form:"password"`
 	validator.Validator `form:"-"`
 }
 
@@ -213,10 +232,10 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name: "session_token",
-		Value: token,
-		Path: "/",
-		Expires: time.Now().Add(24*time.Hour),
+		Name:     "session_token",
+		Value:    token,
+		Path:     "/",
+		Expires:  time.Now().Add(24 * time.Hour),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	})
@@ -231,10 +250,10 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name: "session_token",
-		Value: "",
-		Path: "/",
-		Expires: time.Unix(0, 0),
+		Name:     "session_token",
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Unix(0, 0),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	})

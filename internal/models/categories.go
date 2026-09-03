@@ -41,9 +41,8 @@ func (m *CategoryModel) ByPostID(postID int) ([]*Category, error) {
 	stmt := `
 		SELECT c.id, c.name
 		FROM categories c
-		INNER JOIN post_categories pc ON pc.category_id = c.id
-		WHERE pc.post_id = ?
-		ORDER BY c.name ASC`
+		JOIN post_categories pc ON c.id = pc.category_id
+		WHERE pc.post_id = ?`
 
 	rows, err := m.DB.Query(stmt, postID)
 	if err != nil {

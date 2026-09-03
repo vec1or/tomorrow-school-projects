@@ -8,12 +8,13 @@ import (
 )
 
 type templateData struct {
-	CurrentYear int
+	CurrentYear     int
 	IsAuthenticated bool
-	Post        *models.Post
-	Posts       []*models.Post
-	Comments    []*models.Comment
-	Form        any
+	Post            *models.Post
+	Posts           []*models.Post
+	Categories      []*models.Category
+	Comments        []*models.Comment
+	Form            any
 }
 
 func humanDate(t time.Time) string {
