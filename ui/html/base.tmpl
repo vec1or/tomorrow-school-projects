@@ -3,24 +3,36 @@
 <html lang='en'>
     <head>
         <meta charset='utf-8'>
-        <title>{{template "title".}} - Posts</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <meta name='description' content='A community forum for thoughtful conversations.'>
+        <title>{{template "title" .}} · Forum</title>
         <link rel='stylesheet' href='/static/css/main.css'>
         <link rel='shortcut icon' href='/static/img/favicon.ico' type='image/x-icon'>
-        <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700'>
     </head>
     <body>
-        <header>
-            <h1><a href='/'>Posts</a></h1>
+        <header class='site-header'>
+            <div class='shell header-inner'>
+                <a class='brand' href='/' aria-label='Forum home'>
+                    <span class='brand-mark' aria-hidden='true'>F</span>
+                    <span class='brand-copy'>
+                        <strong>Forum</strong>
+                        <small>Ideas worth discussing</small>
+                    </span>
+                </a>
+                <span class='header-note'>Community space</span>
+            </div>
         </header>
         {{template "nav" .}}
-        <main>
-            {{template "main".}}
+        <main class='shell page-content'>
+            {{template "main" .}}
         </main>
-        <footer>Powered by <a href='https://golang.org/'>Go</a></footer>
+        <footer class='site-footer'>
+            <div class='shell footer-inner'>
+                <span>Built with Go and SQLite</span>
+                <span>&copy; {{.CurrentYear}} Forum</span>
+            </div>
+        </footer>
         <script src="/static/js/main.js" type="text/javascript"></script>
     </body>
-    <footer>
-        Powered by <a href='https://golang.org/'>Go</a> in {{.CurrentYear}}
-    </footer>
 </html>
 {{end}}

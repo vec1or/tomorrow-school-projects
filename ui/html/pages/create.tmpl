@@ -1,31 +1,40 @@
 {{define "title"}}Create a new Post{{end}}
 
 {{define "main"}}
-<form action='/post/create' method='POST'>
-    <div>
-        <label>Title:</label>
-        {{with .Form.FieldErrors.title}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <input type='text' name='title' value='{{.Form.Title}}'>
+<section class='editor-layout'>
+    <div class='page-heading'>
+        <span class='eyebrow'>New discussion</span>
+        <h1>Create a post</h1>
+        <p>Give your topic a clear title and enough context for others to join in.</p>
     </div>
-    <div>
-        <label>Content:</label>
-        {{with .Form.FieldErrors.content}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <textarea name='content'>{{.Form.Content}}</textarea>
-    </div>
-    <div>
-        <label>Categories:</label>
-        {{with .Form.FieldErrors.category}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        {{range .Categories}}
-            <input type='checkbox' name='category' value='{{.ID}}'> {{.Name}}
-        {{end}}
-    <div>
-        <input type='submit' value='Publish post'>
-    </div>
-</form>
+    <form class='editor-panel' action='/post/create' method='POST'>
+        <div class='form-group'>
+            <label for='title'>Post title</label>
+            {{with .Form.FieldErrors.title}}<span class='field-error'>{{.}}</span>{{end}}
+            <input id='title' type='text' name='title' value='{{.Form.Title}}' placeholder='What would you like to discuss?' maxlength='100'>
+            <span class='field-hint'>Keep it specific and easy to understand.</span>
+        </div>
+        <div class='form-group'>
+            <label for='content'>Message</label>
+            {{with .Form.FieldErrors.content}}<span class='field-error'>{{.}}</span>{{end}}
+            <textarea id='content' name='content' placeholder='Add details, context or a question...'>{{.Form.Content}}</textarea>
+        </div>
+        <fieldset class='form-group'>
+            <legend>Categories</legend>
+            {{with .Form.FieldErrors.category}}<span class='field-error'>{{.}}</span>{{end}}
+            <div class='category-grid'>
+                {{range .Categories}}
+                    <label class='category-option'>
+                        <input type='checkbox' name='category' value='{{.ID}}'>
+                        <span>{{.Name}}</span>
+                    </label>
+                {{end}}
+            </div>
+        </fieldset>
+        <div class='form-actions'>
+            <a class='button button-secondary' href='/'>Cancel</a>
+            <button class='button' type='submit'>Publish post <span aria-hidden='true'>&rarr;</span></button>
+        </div>
+    </form>
+</section>
 {{end}}

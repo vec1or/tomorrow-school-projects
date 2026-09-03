@@ -1,31 +1,56 @@
 {{define "title"}}Post #{{.Post.ID}}{{end}}
 
 {{define "main"}}
-    {{with .Post}}
-        <div class='post'>
-            <div class='metadata'>
-                <strong>{{.Title}}</strong>
-                <span>#{{.ID}}</span>
-            </div>
-            <pre><code>{{.Content}}</code></pre>
-            <div class='metadata'>
-                <time>Created: {{humandate .CreatedAt}}</time>
-            </div>
-        </div>
-    {{end}}
-
-    <h3>Comments</h3>
-    {{if .Comments}}
-        {{range .Comments}}
-            <div class='comment'>
-                <div class='metadata'>
-                    <strong>{{.Username}}</strong>
-                    <time>{{humandate .CreatedAt}}</time>
+<div class='thread-layout'>
+    <section>
+        {{with .Post}}
+            <article class='thread-post'>
+                <div class='thread-topline'>
+                    <a href='/'>&larr; All discussions</a>
+                    <span>Topic #{{.ID}}</span>
                 </div>
-                <p>{{.Content}}</p>
-            </div>
+                <h1>{{.Title}}</h1>
+                <div class='post-meta'>
+                    <span class='avatar-placeholder'>U</span>
+                    <span>User {{.UserID}}</span>
+                    <span class='meta-dot'>&bull;</span>
+                    <time datetime='{{.CreatedAt}}'>{{humandate .CreatedAt}}</time>
+                </div>
+                <div class='thread-content'>{{.Content}}</div>
+            </article>
         {{end}}
-    {{else}}
-        <p>No comments yet.</p>
-    {{end}}
+
+        <section class='comments-section'>
+            <div class='section-heading compact'>
+                <h2>Comments</h2>
+                {{if .Comments}}<span class='count-badge'>{{len .Comments}}</span>{{end}}
+            </div>
+
+            {{if .Comments}}
+                <div class='comment-list'>
+                    {{range .Comments}}
+                        <article class='comment-card'>
+                            <div class='comment-author'>
+                                <span class='avatar-placeholder'>{{printf "%.1s" .Username}}</span>
+                                <div><strong>{{.Username}}</strong><time datetime='{{.CreatedAt}}'>{{humandate .CreatedAt}}</time></div>
+                            </div>
+                            <p>{{.Content}}</p>
+                        </article>
+                    {{end}}
+                </div>
+            {{else}}
+                <div class='empty-state small'>
+                    <h3>No comments yet</h3>
+                    <p>This discussion is waiting for its first reply.</p>
+                </div>
+            {{end}}
+        </section>
+    </section>
+
+    <aside class='thread-sidebar'>
+        <span class='eyebrow'>Community note</span>
+        <h3>Keep it constructive</h3>
+        <p>Stay on topic, explain your point clearly and treat other members with respect.</p>
+    </aside>
+</div>
 {{end}}

@@ -1,13 +1,23 @@
 {{define "nav"}}
-<nav>
-    <a href='/'>Home</a>
-    {{if .IsAuthenticated}}
-        <form action='/user/logout' method='POST'>
-            <button type='submit'>Logout</button>
-        </form>
-    {{else}}
-        <a href='/user/login'>Login</a>
-        <a href='/user/signup'>Signup</a>
-    {{end}}
+<nav class='site-nav' aria-label='Main navigation'>
+    <div class='shell nav-inner'>
+        <div class='nav-links'>
+            <a href='/'>Discussions</a>
+            {{if .IsAuthenticated}}
+                <a href='/post/create'>Create post</a>
+            {{end}}
+        </div>
+        <div class='nav-actions'>
+            {{if .IsAuthenticated}}
+                <span class='status-pill'><span></span> Signed in</span>
+                <form action='/user/logout' method='POST'>
+                    <button class='nav-button' type='submit'>Log out</button>
+                </form>
+            {{else}}
+                <a class='text-link' href='/user/login'>Log in</a>
+                <a class='button button-small' href='/user/signup'>Join forum</a>
+            {{end}}
+        </div>
+    </div>
 </nav>
 {{end}}

@@ -1,30 +1,37 @@
 {{define "title"}}Signup{{end}}
 
 {{define "main"}}
-<form action='/user/signup' method='POST' novalidate>
-    <div>
-        <label>Username:</label>
-        {{with .Form.FieldErrors.username}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <input type='text' name='username' value='{{.Form.Username}}'>
+<section class='auth-layout'>
+    <div class='auth-intro'>
+        <span class='eyebrow'>Join the forum</span>
+        <h1>Your next good idea starts here.</h1>
+        <p>Create an account and become part of a community built around useful conversations.</p>
+        <div class='auth-decoration' aria-hidden='true'><span></span><span></span><span></span></div>
     </div>
-    <div>
-        <label>Email:</label>
-        {{with .Form.FieldErrors.email}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <input type='email' name='email' value='{{.Form.Email}}'>
+    <div class='form-panel'>
+        <div class='panel-heading'>
+            <h2>Create account</h2>
+            <p>It only takes a moment.</p>
+        </div>
+        <form action='/user/signup' method='POST' novalidate>
+            <div class='form-group'>
+                <label for='username'>Username</label>
+                {{with .Form.FieldErrors.username}}<span class='field-error'>{{.}}</span>{{end}}
+                <input id='username' type='text' name='username' value='{{.Form.Username}}' placeholder='Choose a username' autocomplete='username'>
+            </div>
+            <div class='form-group'>
+                <label for='email'>Email address</label>
+                {{with .Form.FieldErrors.email}}<span class='field-error'>{{.}}</span>{{end}}
+                <input id='email' type='email' name='email' value='{{.Form.Email}}' placeholder='you@example.com' autocomplete='email'>
+            </div>
+            <div class='form-group'>
+                <label for='password'>Password</label>
+                {{with .Form.FieldErrors.password}}<span class='field-error'>{{.}}</span>{{end}}
+                <input id='password' type='password' name='password' placeholder='At least 8 characters' autocomplete='new-password'>
+            </div>
+            <button class='button button-full' type='submit'>Create account</button>
+        </form>
+        <p class='form-switch'>Already registered? <a href='/user/login'>Log in</a></p>
     </div>
-    <div>
-        <label>Password:</label>
-        {{with .Form.FieldErrors.password}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <input type='password' name='password'>
-    </div>
-    <div>
-        <input type='submit' value='Signup'>
-    </div>
-</form>
+</section>
 {{end}}

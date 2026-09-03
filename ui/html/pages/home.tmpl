@@ -1,23 +1,54 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-    <h2>Latest Posts</h2>
-    {{if .Posts}}
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>CreatedAt</th>
-            <th>ID</th>
-        </tr>
-        {{range .Posts}}
-        <tr>
-            <td><a href='/post/view/{{.ID}}'>{{.Title}}</a><td>
-            <td>{{humandate .CreatedAt}}</td>
-            <td>#{{.ID}}</td>
-        </tr>
-        {{end}}
-    </table>
+<section class='hero'>
+    <div>
+        <span class='eyebrow'>Open conversations</span>
+        <h1>Share an idea.<br>Start a discussion.</h1>
+        <p>Browse recent topics, exchange opinions and help the community learn together.</p>
+    </div>
+    {{if .IsAuthenticated}}
+        <a class='button' href='/post/create'>Create a post <span aria-hidden='true'>&rarr;</span></a>
     {{else}}
-        <p>There's nothing to see here yet!</p>
+        <a class='button' href='/user/signup'>Join the community <span aria-hidden='true'>&rarr;</span></a>
     {{end}}
+</section>
+
+<section class='discussion-section'>
+    <div class='section-heading'>
+        <div>
+            <span class='eyebrow'>What's new</span>
+            <h2>Latest discussions</h2>
+        </div>
+        {{if .Posts}}<span class='count-badge'>{{len .Posts}} topics</span>{{end}}
+    </div>
+
+    {{if .Posts}}
+        <div class='post-list'>
+            {{range .Posts}}
+                <article class='post-card'>
+                    <div class='post-number' aria-hidden='true'>#{{.ID}}</div>
+                    <div class='post-card-content'>
+                        <a class='post-card-title' href='/post/view/{{.ID}}'>{{.Title}}</a>
+                        <p>{{.Content}}</p>
+                        <div class='post-meta'>
+                            <span class='avatar-placeholder'>U</span>
+                            <span>User {{.UserID}}</span>
+                            <span class='meta-dot'>&bull;</span>
+                            <time datetime='{{.CreatedAt}}'>{{humandate .CreatedAt}}</time>
+                        </div>
+                    </div>
+                    <a class='open-post' href='/post/view/{{.ID}}' aria-label='Open {{.Title}}'>&rarr;</a>
+                </article>
+            {{end}}
+        </div>
+    {{else}}
+        <div class='empty-state'>
+            <span class='empty-icon' aria-hidden='true'>+</span>
+            <h3>No discussions yet</h3>
+            <p>Be the first person to start a conversation.</p>
+            {{if .IsAuthenticated}}<a class='button button-small' href='/post/create'>Create the first post</a>{{end}}
+        </div>
+    {{end}}
+</section>
 {{end}}
