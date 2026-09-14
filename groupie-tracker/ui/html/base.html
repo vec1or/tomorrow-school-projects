@@ -1,0 +1,30 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{block "title" .}}Groupie Tracker{{end}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <header class="site-header">
+        <a href="/artists/" class="site-logo">
+            <span class="logo-mark">◈</span>
+            <span class="logo-text">Groupie Tracker</span>
+        </a>
+    </header>
+
+    <main class="site-main">
+        {{block "main" .}}{{end}}
+    </main>
+
+    <footer class="site-footer">
+        <p>Groupie Tracker &mdash; Concert data explorer</p>
+    </footer>
+</body>
+</html>
+{{end}}
