@@ -247,5 +247,9 @@ go build -o forum ./cmd/web
 
 Open <http://localhost:8080>.
 
+## Acknowledgements
+
+This project is based on the [01-edu Forum subject](https://public.01-edu.org/subjects/forum/).
+
 ## Authors
 #lsabit #almuratov #bkalzhan #dkalzhan
