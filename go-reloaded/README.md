@@ -1,8 +1,5 @@
 # GO-RELOADED
 
-## For Audit Questions
-- https://github.com/01-edu/public/tree/master/subjects/go-reloaded/audit
-
 ## Overview
 Go-Reloaded is a command-line tool that reads text files and applies specific transformations using various commands within the text. Finally, it outputs the transformed text.
 
@@ -59,6 +56,10 @@ $ go run . sample.txt result.txt
 $ cat result.txt
 Punctuation tests are... kinda boring, what do you think?
 ```
+
+## Acknowledgements
+
+This project is based on the [01-edu Go Reloaded subject](https://public.01-edu.org/subjects/go-reloaded/).
 
 ## For Testing
 Type: ```go test -v```
