@@ -266,4 +266,8 @@ The pathfinder performs at most `K` augmentations. Each augmentation uses Dijkst
 
 The implementation avoids enumerating all possible simple paths, which would become impractical on large colonies containing many branches and cycles.
 
+## Acknowledgements
+
+This project is based on the [01-edu Lem-in subject](https://public.01-edu.org/subjects/lem-in/).
+
 Credits: #dkalzhan #unurlanky
