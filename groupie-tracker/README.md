@@ -66,6 +66,10 @@ The project follows a layered architecture:
 - HTML templates
 - CSS
 
+## Acknowledgements
+
+This project is based on the [01-edu Groupie Tracker subject](https://public.01-edu.org/subjects/groupie-tracker/).
+
 ## How to test
 
 ```bash
