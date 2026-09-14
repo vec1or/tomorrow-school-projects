@@ -1,0 +1,84 @@
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+<section class='hero'>
+    <div>
+        <span class='eyebrow'>Open conversations</span>
+        <h1>Share an idea.<br>Start a discussion.</h1>
+        <p>Browse recent topics, exchange opinions and help the community learn together.</p>
+    </div>
+    {{if .IsAuthenticated}}
+        <a class='button' href='/post/create'>Create a post <span aria-hidden='true'>&rarr;</span></a>
+    {{else}}
+        <a class='button' href='/user/signup'>Join the community <span aria-hidden='true'>&rarr;</span></a>
+    {{end}}
+</section>
+
+<section class='discussion-section'>
+    <div class='section-heading'>
+        <div>
+            <span class='eyebrow'>What's new</span>
+            <h2>{{if eq .ActiveFilter "created"}}My discussions{{else if eq .ActiveFilter "liked"}}Liked discussions{{else}}Latest discussions{{end}}</h2>
+        </div>
+        <span class='count-badge'>{{len .Posts}} topics</span>
+    </div>
+
+    <div class='filter-panel' aria-label='Discussion filters'>
+        <div class='filter-row'>
+            <span class='filter-label'>Category</span>
+            <div class='filter-options'>
+                <a class='filter-chip {{if eq .SelectedCategoryID 0}}active{{end}}' href='/?{{if .ActiveFilter}}filter={{.ActiveFilter}}{{end}}'>All</a>
+                {{range .Categories}}
+                    <a class='filter-chip {{if eq $.SelectedCategoryID .ID}}active{{end}}' href='/?category={{.ID}}{{if $.ActiveFilter}}&filter={{$.ActiveFilter}}{{end}}'>{{.Name}}</a>
+                {{end}}
+            </div>
+        </div>
+        {{if .IsAuthenticated}}
+            <div class='filter-row'>
+                <span class='filter-label'>Show</span>
+                <div class='filter-options'>
+                    <a class='filter-chip {{if eq .ActiveFilter ""}}active{{end}}' href='/?{{if .SelectedCategoryID}}category={{.SelectedCategoryID}}{{end}}'>All posts</a>
+                    <a class='filter-chip {{if eq .ActiveFilter "created"}}active{{end}}' href='/?filter=created{{if .SelectedCategoryID}}&category={{.SelectedCategoryID}}{{end}}'>Created by me</a>
+                    <a class='filter-chip {{if eq .ActiveFilter "liked"}}active{{end}}' href='/?filter=liked{{if .SelectedCategoryID}}&category={{.SelectedCategoryID}}{{end}}'>Liked by me</a>
+                </div>
+            </div>
+        {{end}}
+    </div>
+
+    {{if .Posts}}
+        <div class='post-list'>
+            {{range .Posts}}
+                <article class='post-card'>
+                    <div class='post-number' aria-hidden='true'>#{{.ID}}</div>
+                    <div class='post-card-content'>
+                        <div class='category-tags'>
+                            {{range .Categories}}<span>{{.Name}}</span>{{end}}
+                        </div>
+                        <a class='post-card-title' href='/post/view/{{.ID}}'>{{.Title}}</a>
+                        <p>{{.Content}}</p>
+                        <div class='post-meta post-meta-wide'>
+                            <span class='avatar-placeholder'>{{printf "%.1s" .Username}}</span>
+                            <span>{{.Username}}</span>
+                            <span class='meta-dot'>&bull;</span>
+                            <time datetime='{{.CreatedAt}}'>{{humandate .CreatedAt}}</time>
+                            <span class='meta-stats' aria-label='Post activity'>
+                                <span title='Likes'>&uarr; {{.LikeCount}}</span>
+                                <span title='Dislikes'>&darr; {{.DislikeCount}}</span>
+                                <span title='Comments'>&#128172; {{.CommentCount}}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <a class='open-post' href='/post/view/{{.ID}}' aria-label='Open {{.Title}}'>&rarr;</a>
+                </article>
+            {{end}}
+        </div>
+    {{else}}
+        <div class='empty-state'>
+            <span class='empty-icon' aria-hidden='true'>+</span>
+            <h3>No discussions found</h3>
+            <p>Try another filter or start a new conversation.</p>
+            {{if .IsAuthenticated}}<a class='button button-small' href='/post/create'>Create a post</a>{{end}}
+        </div>
+    {{end}}
+</section>
+{{end}}
